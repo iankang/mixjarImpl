@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,6 +18,10 @@ import com.mixsteroids.mixjar.MixCloud
 import com.mixsteroids.mixjar.models.TagResponse
 import com.mixsteroids.mixjar.models.UserResponse
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 
 class MainActivity : ComponentActivity() {
@@ -28,13 +33,7 @@ class MainActivity : ComponentActivity() {
         mixjarViewModel.getTag()
         setContent {
             MixjarImplTheme {
-                // A surface container using the 'background' color from the theme
-                val tags:TagResponse? by mixjarViewModel.tags.observeAsState()
-
-                Surface(color = MaterialTheme.colors.background) {
-
-                    tags?.let { Greeting(it?.name) }
-                }
+                TopBar()
             }
         }
 
@@ -47,10 +46,22 @@ fun Greeting(name: String) {
     Text(text = "Hello $name!")
 }
 
+@Composable
+fun TopBar(){
+    TopAppBar(
+        title = { Text(
+            text = stringResource(R.string.app_name),
+            fontSize = 18.sp)
+        },
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = Color.White
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     MixjarImplTheme {
-        Greeting("Android")
+     TopBar()
     }
 }
