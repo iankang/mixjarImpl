@@ -24,9 +24,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mixjarViewModel.getTag()
+        mixjarViewModel.getTrending()
         setContent {
             MixjarImplTheme {
-                MainScreen()
+                MainScreen(mixjarViewModel)
             }
         }
 
@@ -35,10 +36,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation(navController:NavHostController){
+fun Navigation(navController:NavHostController, mixjarViewModel: MixjarViewModel){
    NavHost(navController,startDestination = NavigationItem.Trending.route){
        composable(NavigationItem.Trending.route){
-           TrendingScreen()
+           TrendingScreen(viewModel = mixjarViewModel)
        }
        composable(NavigationItem.Listens.route){
            GenericScreen("Listens")
@@ -102,23 +103,23 @@ fun BottomNavigationBar(navController: NavController) {
 }
 
 @Composable
-fun MainScreen(){
+fun MainScreen(mixjarViewModel: MixjarViewModel){
     val navController = rememberNavController()
     Scaffold(
         topBar = { TopBar()},
         bottomBar = { BottomNavigationBar(navController)}
     ) {
-        Navigation(navController)
+        Navigation(navController, mixjarViewModel)
     }
 }
-@Composable
-@Preview(name = "mainScreenDay")
-@Preview(name = "mainScreenNight", uiMode = UI_MODE_NIGHT_YES)
-fun MainScreenPreview(){
-    MixjarImplTheme {
-        MainScreen()
-    }
-}
+//@Composable
+//@Preview(name = "mainScreenDay")
+//@Preview(name = "mainScreenNight", uiMode = UI_MODE_NIGHT_YES)
+//fun MainScreenPreview(){
+//    MixjarImplTheme {
+//        MainScreen()
+//    }
+//}
 
 @Preview(name = "dayBottomNav")
 @Preview(name = "nightBottomNav",uiMode = UI_MODE_NIGHT_YES)

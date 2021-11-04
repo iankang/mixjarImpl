@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.mixsteroids.mixjar.MixCloud
+import com.mixsteroids.mixjar.models.CityAndTagPopularResponse
 import com.mixsteroids.mixjar.models.TagResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,9 @@ class MixjarViewModel:ViewModel() {
 
     private var _tags = MutableLiveData<TagResponse?>()
     val tags: LiveData<TagResponse?> = _tags
+
+    private  var _trendingPopular = MutableLiveData<CityAndTagPopularResponse?>()
+    val trendingPopular: LiveData<CityAndTagPopularResponse?> = _trendingPopular
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -34,6 +38,19 @@ class MixjarViewModel:ViewModel() {
     fun getTag(){
         coroutineScope.launch {
             gettingTags()
+        }
+    }
+
+    private suspend fun gettingTrending(): CityAndTagPopularResponse? {
+        val trendingResponse: CityAndTagPopularResponse? = mixCloud.getTagAndCityPopular("reggae","nairobi",1)
+        Log.e("trendingResp",trendingResponse?.data.toString())
+        _trendingPopular.postValue(trendingResponse)
+        return trendingResponse
+    }
+
+    fun getTrending(){
+        coroutineScope.launch {
+            gettingTrending()
         }
     }
 }

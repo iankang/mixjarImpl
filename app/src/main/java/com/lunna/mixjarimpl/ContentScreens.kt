@@ -1,6 +1,7 @@
 package com.lunna.mixjarimpl
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,7 +20,9 @@ import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 
 
 @Composable
-fun TrendingScreen(){
+fun TrendingScreen(viewModel: MixjarViewModel){
+    viewModel.getTrending()
+    Log.e("trendingPopular",viewModel.trendingPopular.value.toString())
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,14 +39,15 @@ fun TrendingScreen(){
     }
 }
 
-@Preview(name = "trendingScreenDay")
-@Preview(name = "trendingScreenNight",uiMode = UI_MODE_NIGHT_YES)
+//@Preview(name = "trendingScreenDay")
+//@Preview(name = "trendingScreenNight",uiMode = UI_MODE_NIGHT_YES)
+//@Composable
+//fun TrendingScreenPreview(){
+//    MixjarImplTheme {
+//        TrendingScreen()
+//    }
+//}
 @Composable
-fun TrendingScreenPreview(){
-    MixjarImplTheme {
-        TrendingScreen()
-    }
-}@Composable
 fun GenericScreen(text:String){
     Column(
         modifier = Modifier
