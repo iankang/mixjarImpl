@@ -5,8 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 import androidx.compose.ui.graphics.Color
@@ -108,8 +111,11 @@ fun MainScreen(mixjarViewModel: MixjarViewModel){
     Scaffold(
         topBar = { TopBar()},
         bottomBar = { BottomNavigationBar(navController)}
-    ) {
-        Navigation(navController, mixjarViewModel)
+    ) { innerPadding ->
+        // Apply the padding globally to the whole BottomNavScreensController
+        Box(modifier = Modifier.padding(innerPadding)) {
+            Navigation(navController, mixjarViewModel)
+        }
     }
 }
 //@Composable

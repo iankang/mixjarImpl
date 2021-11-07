@@ -1,6 +1,8 @@
 package com.lunna.mixjarimpl
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,8 +22,7 @@ class MixjarViewModel:ViewModel() {
     private var _tags = MutableLiveData<TagResponse?>()
     val tags: LiveData<TagResponse?> = _tags
 
-    private  var _trendingPopular = MutableLiveData<CityAndTagPopularResponse?>()
-    val trendingPopular: LiveData<CityAndTagPopularResponse?> = _trendingPopular
+    val popularPostMutableState:MutableState<CityAndTagPopularResponse?> = mutableStateOf(null)
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -41,10 +42,10 @@ class MixjarViewModel:ViewModel() {
         }
     }
 
-    private suspend fun gettingTrending(): CityAndTagPopularResponse? {
+    private suspend fun gettingTrending():CityAndTagPopularResponse? {
         val trendingResponse: CityAndTagPopularResponse? = mixCloud.getTagAndCityPopular("reggae","nairobi",1)
         Log.e("trendingResp",trendingResponse?.data.toString())
-        _trendingPopular.postValue(trendingResponse)
+        popularPostMutableState.value = trendingResponse
         return trendingResponse
     }
 
