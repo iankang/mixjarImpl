@@ -5,24 +5,39 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.lunna.mixjarimpl.models.UserInfo
 
 class MainActivity : ComponentActivity() {
 
-    private  val mixjarViewModel by viewModels<MixjarViewModel>()
+    val mixjarViewModel by viewModels<MixjarViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +45,8 @@ class MainActivity : ComponentActivity() {
         mixjarViewModel.getTrending()
         setContent {
             MixjarImplTheme {
-                MainScreen(mixjarViewModel)
+                val infoState = rememberSaveable{mixjarViewModel.userInfoMutableState}
+               AppScreen(userInfo = infoState, mixjarViewModel = mixjarViewModel)
             }
         }
 
@@ -136,12 +152,112 @@ fun BottomNavigationPreview(){
     }
 
 }
+@Composable
+fun AppScreen(userInfo: MutableState<UserInfo?>, mixjarViewModel: MixjarViewModel) {
+    if (userInfo.value?.userName == null) {
+        LoginScreen(userInfo)
+    } else {
+        MainScreen(mixjarViewModel=mixjarViewModel )
+    }
+}
 
+@Composable
+fun UserInfoScreen(userInfo: UserInfo) {
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(
+            text = "Username: ${userInfo.userName}",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.h6
+        )
+
+    }
+}
+
+@Composable
+fun LoginScreen(userInfo: MutableState<UserInfo?>) {
+    Column(
+         modifier = Modifier.fillMaxSize(),
+       horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        val userNameState = rememberSaveable { mutableStateOf("") }
+        Surface(
+            border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+            modifier = Modifier.padding(8.dp)
+        ) {
+            TextField(
+                value = userNameState.value,
+                onValueChange = { userNameState.value = it },
+                label = { Text("Username") },
+                placeholder = { Text("Username") },
+            )
+
+        }
+
+
+        val password = rememberSaveable { mutableStateOf("") }
+        val passwordVisibility = remember { mutableStateOf(false) }
+        Surface(
+            border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+            modifier = Modifier.padding(8.dp)
+        ) {
+
+
+            TextField(
+                value = password.value,
+                onValueChange = { password.value = it },
+                label = { Text("Password") },
+                placeholder = { Text("Password") },
+                visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    val image = if (passwordVisibility.value)
+                        Icons.Filled.ThumbUp
+                    else Icons.Filled.Delete
+
+                    IconButton(onClick = {
+                        passwordVisibility.value = !passwordVisibility.value
+                    }) {
+                        Icon(imageVector = image, "")
+                    }
+                }
+            )
+        }
+
+
+        if (userNameState.value.isNotEmpty()
+            && password.value.isNotEmpty()
+        ) {
+            Row(horizontalArrangement = Arrangement.End) {
+                Button(
+                    modifier = Modifier.padding(8.dp),
+                    onClick = {
+                        println("Logged in!")
+                        userInfo.value?.userName = userNameState.value
+                        userInfo.value?.userLoggedIn = true
+                    }
+                ){
+                    Text(text = "Login",
+                    color = MaterialTheme.colors.primary)
+                }
+            }
+        } else {
+            Text(
+                text = "Please enter both username and password!",
+                modifier = Modifier.padding(8.dp),
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primary,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
 @Preview(showBackground = true,
 uiMode = UI_MODE_NIGHT_YES)
+@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     MixjarImplTheme {
-     TopBar()
+//     LoginScreen(UserInfo(false,"kangethe"))
     }
 }

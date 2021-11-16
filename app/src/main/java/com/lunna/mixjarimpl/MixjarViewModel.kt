@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lunna.mixjarimpl.models.UserInfo
 import com.mixsteroids.mixjar.MixCloud
 import com.mixsteroids.mixjar.models.CityAndTagPopularResponse
 import com.mixsteroids.mixjar.models.TagResponse
@@ -23,6 +24,7 @@ class MixjarViewModel:ViewModel() {
     val tags: LiveData<TagResponse?> = _tags
 
     val popularPostMutableState:MutableState<CityAndTagPopularResponse?> = mutableStateOf(null)
+    val userInfoMutableState: MutableState<UserInfo?> = mutableStateOf(null)
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
