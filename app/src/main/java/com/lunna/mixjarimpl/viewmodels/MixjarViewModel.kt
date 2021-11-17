@@ -1,4 +1,4 @@
-package com.lunna.mixjarimpl
+package com.lunna.mixjarimpl.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -12,7 +12,6 @@ import com.mixsteroids.mixjar.models.CityAndTagPopularResponse
 import com.mixsteroids.mixjar.models.TagResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
@@ -25,6 +24,7 @@ class MixjarViewModel:ViewModel() {
 
     val popularPostMutableState:MutableState<CityAndTagPopularResponse?> = mutableStateOf(null)
     val userInfoMutableState: MutableState<UserInfo?> = mutableStateOf(null)
+    val userNameState:MutableState<String> = mutableStateOf("")
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
