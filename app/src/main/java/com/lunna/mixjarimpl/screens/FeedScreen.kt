@@ -20,9 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.paging.LoadState
 import androidx.paging.compose.items
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
+import com.lunna.mixjarimpl.utilities.ErrorItem
+import com.lunna.mixjarimpl.utilities.LoadingItem
+import com.lunna.mixjarimpl.utilities.LoadingScreen
+import com.lunna.mixjarimpl.utilities.LoadingView
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
+import com.mixsteroids.mixjar.models.UserFeedCloudcasts
 
 
 @Composable
@@ -40,11 +46,41 @@ fun FeedScreenPreview(){
 @Composable
 fun FeedList(feed: Flow<PagingData<UserFeedData>>){
     val lazyFeedItems: LazyPagingItems<UserFeedData> = feed.collectAsLazyPagingItems()
-
     LazyColumn {
        items(lazyFeedItems){userFeedData ->
-           userFeedData?.let {FeedItem(it?.title) }
+           userFeedData?.let {FeedItem(it.key) }
        }
+
+        lazyFeedItems.apply {
+            when{
+                loadState.refresh is LoadState.Loading ->{
+                    item { LoadingView(modifier = Modifier.fillParentMaxSize()) }
+                }
+                loadState.append is LoadState.Loading ->{
+                    item { LoadingItem() }
+                }
+
+                loadState.refresh is LoadState.Error ->{
+                    val e = lazyFeedItems.loadState.refresh as LoadState.Error
+                    item {
+                        ErrorItem(
+                            message = e.error.localizedMessage!!,
+                            modifier = Modifier.fillParentMaxSize(),
+                            onClickRetry = {retry()}
+                        )
+                    }
+                }
+                loadState.append is LoadState.Error -> {
+                    val e = lazyFeedItems.loadState.append as LoadState.Error
+                    item {
+                        ErrorItem(
+                            message = e.error.localizedMessage,
+                            onClickRetry = {retry()}
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 @Composable
@@ -68,7 +104,7 @@ fun FeedListPreview(){
 @Composable
 fun FeedItem(title:String){
     Text(
-        text = "title",
+        text = title,
         color = MaterialTheme.colors.onSurface,
     )
 }

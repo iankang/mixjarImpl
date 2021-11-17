@@ -8,8 +8,11 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +40,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         mixjarViewModel.getTag()
         mixjarViewModel.getTrending()
+
+
         setContent {
             MixjarImplTheme {
 
@@ -70,15 +75,73 @@ fun Navigation(navController:NavHostController, mixjarViewModel: MixjarViewModel
 }
 
 @Composable
-fun TopBar(){
+fun TopBar(mixjarViewModel: MixjarViewModel){
     TopAppBar(
         title = { Text(
             text = stringResource(R.string.app_name),
             fontSize = 18.sp)
         },
         backgroundColor = MaterialTheme.colors.primary,
-        contentColor = Color.White
+        contentColor = Color.White,
+        actions = {
+            TopAppBarDropdownMenu(mixjarViewModel)
+        }
     )
+}
+
+@Composable
+fun TopAppBarDropdownMenu(mixjarViewModel: MixjarViewModel) {
+    val expanded = remember { mutableStateOf(false) } // 1
+
+    Box(
+        Modifier
+            .wrapContentSize(Alignment.TopEnd)
+    ) {
+        IconButton(onClick = {
+            expanded.value = true // 2
+        }) {
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = "More Menu"
+            )
+        }
+    }
+
+    DropdownMenu(
+        expanded = expanded.value,
+        onDismissRequest = { expanded.value = false },
+    ) {
+        DropdownMenuItem(onClick = {
+            mixjarViewModel.removeFromDataStore()
+            expanded.value = false // 3
+        }) {
+            Text("Logout")
+        }
+
+//        Divider()
+//
+//        DropdownMenuItem(onClick = {
+//            expanded.value = false
+//        }) {
+//            Text("Second item")
+//        }
+//
+//        Divider()
+//
+//        DropdownMenuItem(onClick = {
+//            expanded.value = false
+//        }) {
+//            Text("Third item")
+//        }
+//
+//        Divider()
+//
+//        DropdownMenuItem(onClick = {
+//            expanded.value = false
+//        }) {
+//            Text("Fourth item")
+//        }
+    }
 }
 
 @Composable
@@ -125,7 +188,7 @@ fun MainScreen(
     feedViewModel: FeedViewModel){
     val navController = rememberNavController()
     Scaffold(
-        topBar = { TopBar()},
+        topBar = { TopBar(mixjarViewModel)},
         bottomBar = { BottomNavigationBar(navController)}
     ) { innerPadding ->
         // Apply the padding globally to the whole BottomNavScreensController
@@ -147,7 +210,8 @@ fun BottomNavigationPreview(){
 }
 @Composable
 fun AppScreen( mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
-    if (mixjarViewModel.userNameState.value.isEmpty()) {
+    mixjarViewModel.getUserNameDataStore()
+    if (mixjarViewModel.userNameDataStore.value.isEmpty()) {
         LoginScreen(mixjarViewModel)
     } else {
         MainScreen(mixjarViewModel,feedViewModel)
@@ -183,6 +247,7 @@ fun LoginScreen(mixjarViewModel: MixjarViewModel) {
                 onClick = {
                     println("Logged in!")
                     mixjarViewModel.userNameState.value = userNameState.value
+                    mixjarViewModel.saveToDataStore(username = userNameState.value)
 
                 }
             ){
