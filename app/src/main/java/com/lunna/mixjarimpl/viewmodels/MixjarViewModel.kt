@@ -26,10 +26,6 @@ class MixjarViewModel(application: Application):AndroidViewModel(application) {
     private var _tags = MutableLiveData<TagResponse?>()
     val tags: LiveData<TagResponse?> = _tags
 
-    private val dataStore = DataStoreManager(application)
-
-    val userNameDataStore:MutableState<String> = mutableStateOf("")
-
     val popularPostMutableState:MutableState<CityAndTagPopularResponse?> = mutableStateOf(null)
 
     val userNameState:MutableState<String> = mutableStateOf("")
@@ -37,28 +33,6 @@ class MixjarViewModel(application: Application):AndroidViewModel(application) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    fun saveToDataStore(username:String?){
-        coroutineScope.launch {
-            if (username != null) {
-                dataStore.saveToDataStore(username)
-            }
-            getUserNameDataStore()
-        }
-    }
-
-    fun removeFromDataStore(){
-        coroutineScope.launch {
-            dataStore.removeFromDataStore()
-            userNameDataStore.value = ""
-        }
-    }
-
-    fun getUserNameDataStore(){
-        coroutineScope.launch {
-            userNameDataStore.value = dataStore.username.first()
-            Log.e("MixjarVMgetUname",dataStore.username.first().toString())
-        }
-    }
 
     private fun gettingTags(): TagResponse? {
         Log.e("mixcloud",mixCloud.toString())

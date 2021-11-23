@@ -10,31 +10,33 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.dataStore
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lunna.mixjarimpl.screens.FeedScreen
+import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    val mixjarViewModel by viewModels<MixjarViewModel>()
-    val feedViewModel by viewModels<FeedViewModel>()
+    private val mixjarViewModel by viewModels<MixjarViewModel>()
+    private val feedViewModel by viewModels<FeedViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +59,9 @@ class MainActivity : ComponentActivity() {
 fun Navigation(navController:NavHostController, mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel){
    NavHost(navController,startDestination = NavigationItem.Feed.route){
        composable(NavigationItem.Feed.route){
-           FeedScreen(feedViewModel)
+           val context = LocalContext.current
+           val dataStore = DataStoreManager(context)
+           FeedScreen(dataStore.username.collectAsState(initial = "").value,feedViewModel)
        }
        composable(NavigationItem.Trending.route){
            TrendingScreen(viewModel = mixjarViewModel)
@@ -93,6 +97,10 @@ fun TopBar(mixjarViewModel: MixjarViewModel){
 fun TopAppBarDropdownMenu(mixjarViewModel: MixjarViewModel) {
     val expanded = remember { mutableStateOf(false) } // 1
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dataStore = DataStoreManager(context)
+
     Box(
         Modifier
             .wrapContentSize(Alignment.TopEnd)
@@ -112,7 +120,10 @@ fun TopAppBarDropdownMenu(mixjarViewModel: MixjarViewModel) {
         onDismissRequest = { expanded.value = false },
     ) {
         DropdownMenuItem(onClick = {
-            mixjarViewModel.removeFromDataStore()
+//            mixjarViewModel.removeFromDataStore()
+            scope.launch {
+                dataStore.removeFromDataStore()
+            }
             expanded.value = false // 3
         }) {
             Text("Logout")
@@ -210,10 +221,12 @@ fun BottomNavigationPreview(){
 }
 @Composable
 fun AppScreen( mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
-    mixjarViewModel.getUserNameDataStore()
-    if (mixjarViewModel.userNameDataStore.value.isEmpty()) {
+    val context = LocalContext.current
+    val dataStore = DataStoreManager(context)
+
+    if(dataStore.username.collectAsState(initial = null).value.isNullOrBlank()){
         LoginScreen(mixjarViewModel)
-    } else {
+    }else{
         MainScreen(mixjarViewModel,feedViewModel)
     }
 }
@@ -221,6 +234,10 @@ fun AppScreen( mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
 
 @Composable
 fun LoginScreen(mixjarViewModel: MixjarViewModel) {
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dataStore = DataStoreManager(context)
     Column(
          modifier = Modifier.fillMaxSize(),
        horizontalAlignment = Alignment.CenterHorizontally,
@@ -247,8 +264,9 @@ fun LoginScreen(mixjarViewModel: MixjarViewModel) {
                 onClick = {
                     println("Logged in!")
                     mixjarViewModel.userNameState.value = userNameState.value
-                    mixjarViewModel.saveToDataStore(username = userNameState.value)
-
+                    scope.launch {
+                        dataStore.saveToDataStore(username = userNameState.value)
+                    }
                 }
             ){
                 Text(text = "Login",

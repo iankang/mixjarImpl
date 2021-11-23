@@ -13,7 +13,7 @@ const val USER_DATASTORE ="mixjar_datastore"
 class DataStoreManager(private val context: Context) {
 
     companion object {
-        private val Context.dataStoree : DataStore<Preferences>  by   preferencesDataStore(
+        private val Context.dataStoree : DataStore<Preferences>  by preferencesDataStore(
             USER_DATASTORE)
         val USERNAME = stringPreferencesKey("username")
     }
@@ -28,7 +28,7 @@ class DataStoreManager(private val context: Context) {
     suspend fun removeFromDataStore() {
 
         context.dataStoree.edit {preferences ->
-            preferences.clear()
+            preferences.remove(USERNAME)
         }
     }
 

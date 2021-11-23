@@ -32,8 +32,10 @@ import com.mixsteroids.mixjar.models.UserFeedCloudcasts
 
 
 @Composable
-fun FeedScreen(feedViewModel: FeedViewModel){
-        FeedList(feedViewModel.feed)
+fun FeedScreen(username: String?, feedViewModel: FeedViewModel){
+    if (username != null) {
+        FeedList(username,feedViewModel)
+    }
 }
 @Composable
 @Preview()
@@ -44,7 +46,8 @@ fun FeedScreenPreview(){
 }
 
 @Composable
-fun FeedList(feed: Flow<PagingData<UserFeedData>>){
+fun FeedList(username:String, feedViewModel: FeedViewModel){
+    val feed = feedViewModel.feed(username)
     val lazyFeedItems: LazyPagingItems<UserFeedData> = feed.collectAsLazyPagingItems()
     LazyColumn {
        items(lazyFeedItems){userFeedData ->
