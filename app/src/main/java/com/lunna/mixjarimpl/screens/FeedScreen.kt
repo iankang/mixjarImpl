@@ -113,6 +113,7 @@ fun FeedItem(title:String){
 }
 
 @Composable
+@Preview
 fun FeedItemPreview(){
     Text(
         text = "title",

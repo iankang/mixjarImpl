@@ -25,23 +25,10 @@ class FeedViewModel(application: Application):AndroidViewModel(application) {
     private val mixCloud = MixCloud()
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private val dataStore = DataStoreManager(application)
-    private val userNameDataStore: MutableState<String> = mutableStateOf("")
-
-//    val feed: Flow<PagingData<UserFeedData>> = Pager(PagingConfig(pageSize = 20)){
-//        Log.e("FeedViewModel","source")
-//        UserFeedSource(dataStore.username.collectAsState(initial = "spartacus").value!!,mixCloud)
-//    }.flow
     fun feed(username:String): Flow<PagingData<UserFeedData>> {
         return Pager(PagingConfig(pageSize = 20)){
             Log.e("FeedViewModel","source")
             UserFeedSource(username,mixCloud)
         }.flow
-    }
-    private fun getUserNameDataStore(){
-        coroutineScope.launch {
-            userNameDataStore.value = dataStore.username.first().toString()
-            Log.e("FeedVMgetUname",dataStore.username.first().toString())
-        }
     }
 }

@@ -18,8 +18,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
+import com.lunna.mixjarimpl.utilities.ErrorItem
+import com.lunna.mixjarimpl.utilities.LoadingItem
+import com.lunna.mixjarimpl.utilities.LoadingView
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
+import com.mixsteroids.mixjar.models.CityAndTagPopularResponseData
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -27,20 +35,15 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun TrendingScreen(viewModel: MixjarViewModel){
     viewModel.getTrending()
-
+    val popularInArea = viewModel.getPopularInYourArea()
+    val popularItems: LazyPagingItems<CityAndTagPopularResponseData> = popularInArea.collectAsLazyPagingItems()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.primary)
             .wrapContentSize(Alignment.Center)
     ) {
-
-//        trendingPop?.data?.forEach { cityAndTagPopularResponseData ->
-//
-//        }
-        val trendingPop = viewModel.popularPostMutableState.value
-        val popular = trendingPop?.data
-        if(popular?.isNotEmpty() == true) {
+        val popular = popularItems
             LazyColumn {
                 items(popular) { cityAndTagPopularResponseData ->
 
@@ -51,16 +54,39 @@ fun TrendingScreen(viewModel: MixjarViewModel){
                         listenCount = cityAndTagPopularResponseData?.listener_count?.toString()?: "0"
                     )
                 }
+
+                popular.apply {
+                    when{
+                        loadState.refresh is LoadState.Loading ->{
+                            item { LoadingView(modifier = Modifier.fillParentMaxSize()) }
+                        }
+                        loadState.append is LoadState.Loading ->{
+                            item { LoadingItem() }
+                        }
+
+                        loadState.refresh is LoadState.Error ->{
+                            val e = popular.loadState.refresh as LoadState.Error
+                            item {
+                                ErrorItem(
+                                    message = e.error.localizedMessage!!,
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    onClickRetry = {retry()}
+                                )
+                            }
+                        }
+                        loadState.append is LoadState.Error -> {
+                            val e = popular.loadState.append as LoadState.Error
+                            item {
+                                ErrorItem(
+                                    message = e.error.localizedMessage,
+                                    onClickRetry = {retry()}
+                                )
+                            }
+                        }
+                    }
+                }
             }
-        }else{
-            Text(
-                text = "Hakuna kitu hapa",
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                textAlign = TextAlign.Center,
-                fontSize = 25.sp
-            )
-        }
+
 
     }
 }

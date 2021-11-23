@@ -40,14 +40,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mixjarViewModel.getTag()
-        mixjarViewModel.getTrending()
-
 
         setContent {
             MixjarImplTheme {
 
-               AppScreen(mixjarViewModel, feedViewModel)
+                AppScreen(mixjarViewModel, feedViewModel)
             }
         }
 
@@ -56,34 +53,40 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation(navController:NavHostController, mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel){
-   NavHost(navController,startDestination = NavigationItem.Feed.route){
-       composable(NavigationItem.Feed.route){
-           val context = LocalContext.current
-           val dataStore = DataStoreManager(context)
-           FeedScreen(dataStore.username.collectAsState(initial = "").value,feedViewModel)
-       }
-       composable(NavigationItem.Trending.route){
-           TrendingScreen(viewModel = mixjarViewModel)
-       }
-       composable(NavigationItem.Listens.route){
-           GenericScreen("Listens")
-       }
-       composable(NavigationItem.Playlists.route){
-           GenericScreen("Playlists")
-       }
-       composable(NavigationItem.Profile.route){
-           GenericScreen("Profile")
-       }
-   }
+fun Navigation(
+    navController: NavHostController,
+    mixjarViewModel: MixjarViewModel,
+    feedViewModel: FeedViewModel
+) {
+    NavHost(navController, startDestination = NavigationItem.Feed.route) {
+        composable(NavigationItem.Feed.route) {
+            val context = LocalContext.current
+            val dataStore = DataStoreManager(context)
+            FeedScreen(dataStore.username.collectAsState(initial = "").value, feedViewModel)
+        }
+        composable(NavigationItem.Trending.route) {
+            TrendingScreen(viewModel = mixjarViewModel)
+        }
+        composable(NavigationItem.Listens.route) {
+            GenericScreen("Listens")
+        }
+        composable(NavigationItem.Playlists.route) {
+            GenericScreen("Playlists")
+        }
+        composable(NavigationItem.Profile.route) {
+            GenericScreen("Profile")
+        }
+    }
 }
 
 @Composable
-fun TopBar(mixjarViewModel: MixjarViewModel){
+fun TopBar(mixjarViewModel: MixjarViewModel) {
     TopAppBar(
-        title = { Text(
-            text = stringResource(R.string.app_name),
-            fontSize = 18.sp)
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                fontSize = 18.sp
+            )
         },
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
@@ -166,21 +169,21 @@ fun BottomNavigationBar(navController: NavController) {
     )
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.primary,
-        contentColor =  Color.White
-    ){
+        contentColor = Color.White
+    ) {
         items.forEach { item ->
             BottomNavigationItem(
-                icon = { Icon(item.icon, contentDescription = null)},
-                label = {Text(text = item.title)},
+                icon = { Icon(item.icon, contentDescription = null) },
+                label = { Text(text = item.title) },
                 selectedContentColor = Color.White,
                 unselectedContentColor = Color.White.copy(0.4f),
                 alwaysShowLabel = true,
                 selected = false,
                 onClick = {
-                    navController.navigate(item.route){
+                    navController.navigate(item.route) {
                         navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route){
-                                saveState =true
+                            popUpTo(route) {
+                                saveState = true
                             }
                         }
                         launchSingleTop = true
@@ -196,38 +199,40 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun MainScreen(
     mixjarViewModel: MixjarViewModel,
-    feedViewModel: FeedViewModel){
+    feedViewModel: FeedViewModel
+) {
     val navController = rememberNavController()
     Scaffold(
-        topBar = { TopBar(mixjarViewModel)},
-        bottomBar = { BottomNavigationBar(navController)}
+        topBar = { TopBar(mixjarViewModel) },
+        bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         // Apply the padding globally to the whole BottomNavScreensController
         Box(modifier = Modifier.padding(innerPadding)) {
-            Navigation(navController, mixjarViewModel,feedViewModel)
+            Navigation(navController, mixjarViewModel, feedViewModel)
         }
     }
 }
 
 
 @Preview(name = "dayBottomNav")
-@Preview(name = "nightBottomNav",uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "nightBottomNav", uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun BottomNavigationPreview(){
+fun BottomNavigationPreview() {
     MixjarImplTheme {
 //        BottomNavigationBar(navController)
     }
 
 }
+
 @Composable
-fun AppScreen( mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
+fun AppScreen(mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
     val context = LocalContext.current
     val dataStore = DataStoreManager(context)
 
-    if(dataStore.username.collectAsState(initial = null).value.isNullOrBlank()){
+    if (dataStore.username.collectAsState(initial = null).value.isNullOrBlank()) {
         LoginScreen(mixjarViewModel)
-    }else{
-        MainScreen(mixjarViewModel,feedViewModel)
+    } else {
+        MainScreen(mixjarViewModel, feedViewModel)
     }
 }
 
@@ -239,11 +244,11 @@ fun LoginScreen(mixjarViewModel: MixjarViewModel) {
     val scope = rememberCoroutineScope()
     val dataStore = DataStoreManager(context)
     Column(
-         modifier = Modifier.fillMaxSize(),
-       horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        val userNameState = rememberSaveable{ mutableStateOf("")}
+        val userNameState = rememberSaveable { mutableStateOf("") }
         Surface(
             border = BorderStroke(2.dp, MaterialTheme.colors.primary),
             modifier = Modifier.padding(8.dp)
@@ -268,9 +273,11 @@ fun LoginScreen(mixjarViewModel: MixjarViewModel) {
                         dataStore.saveToDataStore(username = userNameState.value)
                     }
                 }
-            ){
-                Text(text = "Login",
-                    color = MaterialTheme.colors.secondary)
+            ) {
+                Text(
+                    text = "Login",
+                    color = MaterialTheme.colors.secondary
+                )
             }
         }
         if (userNameState.value.isEmpty()) {
@@ -284,8 +291,11 @@ fun LoginScreen(mixjarViewModel: MixjarViewModel) {
         }
     }
 }
-@Preview(showBackground = true,
-uiMode = UI_MODE_NIGHT_YES)
+
+@Preview(
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
