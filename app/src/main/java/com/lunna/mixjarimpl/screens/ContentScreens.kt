@@ -34,7 +34,6 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun TrendingScreen(viewModel: MixjarViewModel){
-    viewModel.getTrending()
     val popularInArea = viewModel.getPopularInYourArea()
     val popularItems: LazyPagingItems<CityAndTagPopularResponseData> = popularInArea.collectAsLazyPagingItems()
     Column(
