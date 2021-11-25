@@ -22,21 +22,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.dataStore
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lunna.mixjarimpl.screens.FeedScreen
+import com.lunna.mixjarimpl.screens.ProfileScreen
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
+import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.viewModel
 
 class MainActivity : ComponentActivity() {
 
     private val mixjarViewModel by viewModels<MixjarViewModel>()
     private val feedViewModel by viewModels<FeedViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +62,7 @@ fun Navigation(
     feedViewModel: FeedViewModel
 ) {
     NavHost(navController, startDestination = NavigationItem.Feed.route) {
+
         composable(NavigationItem.Feed.route) {
             val context = LocalContext.current
             val dataStore = DataStoreManager(context)
@@ -74,7 +78,7 @@ fun Navigation(
             GenericScreen("Playlists")
         }
         composable(NavigationItem.Profile.route) {
-            GenericScreen("Profile")
+            ProfileScreen()
         }
     }
 }
@@ -91,13 +95,13 @@ fun TopBar(mixjarViewModel: MixjarViewModel) {
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
         actions = {
-            TopAppBarDropdownMenu(mixjarViewModel)
+            TopAppBarDropdownMenu()
         }
     )
 }
 
 @Composable
-fun TopAppBarDropdownMenu(mixjarViewModel: MixjarViewModel) {
+fun TopAppBarDropdownMenu() {
     val expanded = remember { mutableStateOf(false) } // 1
 
     val context = LocalContext.current
@@ -208,7 +212,10 @@ fun MainScreen(
     ) { innerPadding ->
         // Apply the padding globally to the whole BottomNavScreensController
         Box(modifier = Modifier.padding(innerPadding)) {
-            Navigation(navController, mixjarViewModel, feedViewModel)
+            Navigation(
+                navController,
+                mixjarViewModel,
+                feedViewModel)
         }
     }
 }
@@ -225,7 +232,8 @@ fun BottomNavigationPreview() {
 }
 
 @Composable
-fun AppScreen(mixjarViewModel: MixjarViewModel, feedViewModel: FeedViewModel) {
+fun AppScreen(mixjarViewModel: MixjarViewModel,
+              feedViewModel: FeedViewModel) {
     val context = LocalContext.current
     val dataStore = DataStoreManager(context)
 
