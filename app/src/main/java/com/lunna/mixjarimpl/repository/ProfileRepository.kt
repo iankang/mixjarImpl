@@ -14,6 +14,8 @@ import com.mixsteroids.mixjar.models.UserResponse
 import com.mixsteroids.mixjar.utils.Mixcloud
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 class ProfileRepository(
@@ -22,78 +24,48 @@ class ProfileRepository(
     private val TAG: String? = ProfileRepository::class.simpleName
     private val mixCloud: MixCloud = MixCloud()
 
-    private val profileDB = db.profileDAO
+//    private val profileDB = db.profileDAO
 
-    private val _userResponse = MutableLiveData<UserResponse>()
-    val userResponse:LiveData<UserResponse>
-        get() = _userResponse
-
+    private val _userResponse = MutableStateFlow<UserResponse?>(null)
+    val userResponse:StateFlow<UserResponse?> = _userResponse
 
 
-    suspend fun getProfileOnline(key:String){
-        withContext(Dispatchers.IO){
-            val userResponse = mixCloud.getUser(key)
-            Log.e(TAG,userResponse.toString())
-            _userResponse.postValue(userResponse)
-        }
+    val mutableStateOfProfile:MutableState<ProfileEntity?> = mutableStateOf(null)
+
+
+     fun getProfileOnline(key:String): UserResponse? {
+        val userResponse:UserResponse? = mixCloud.getUser(key)
+        Log.e("$TAG getProfileOnline",userResponse.toString())
+       return userResponse
     }
 
-    suspend fun addProfile(key:String?){
-        if (key != null) {
-            getProfileOnline(key)
-        }
-        withContext(Dispatchers.IO){
+     fun addProfile(key:String?){
             if (key != null) {
-
-
-//                val profileEntity = ProfileEntity(
-//                    key = userResponse?.key!!,
-//                 url= userResponse.url,
-//                 username=userResponse.username,
-//                 pictureUrl=userResponse.pictures?.extra_large,
-//                 biog= userResponse.biog,
-//                 createdTime =  userResponse.created_time,
-//                 followerCount= userResponse.follower_count,
-//                 followingCount= userResponse.following_count,
-//                 cloudCastCount= userResponse.cloudcast_count,
-//                 favoriteCount= userResponse.favorite_count,
-//                 listenCount= userResponse.listen_count,
-//                 is_pro= userResponse.is_pro,
-//                 is_premium= userResponse.is_premium,
-//                 city= userResponse.city,
-//                 country= userResponse.country,
-//                 type= userResponse.type
-//                )
-
-                userResponse.value?.toProfileEntity()?.let { profileDB.insertProfile(it) }
+                val userResponse:UserResponse? = getProfileOnline(key)
+                Log.e(TAG,userResponse.toString())
+                db.profileDAO.insertProfile(userResponse?.toProfileEntity())
             }else{
                 Log.e(TAG,"key is empty")
             }
-        }
     }
 
-    suspend fun getProfile(key: String):MutableState<ProfileEntity?>{
-        var mutableStateOfProfile:MutableState<ProfileEntity?> = mutableStateOf(null)
-        withContext(Dispatchers.IO){
-
-            val userResponse= profileDB.getProfileByKey(key)
-
-            if(userResponse!= null) {
-                Log.e("$TAG getProf", userResponse.toString())
-            }
+    fun getProfile(key: String): ProfileEntity? {
+            val userResponse= db.profileDAO.getProfileByKey(key)
+            Log.e("$TAG getProf", userResponse.toString())
             mutableStateOfProfile.value = userResponse
-        }
-        return mutableStateOfProfile
+        return userResponse
     }
 
-    suspend fun deleteProfile(key: String?){
-        withContext(Dispatchers.IO){
-            key?.let { profileDB.deleteSingleProfileByKey(it) }
+    fun deleteProfile(key: String?){
+        if (key != null) {
+            db.profileDAO.deleteSingleProfileByKey(key)
         }
     }
+}
 
-    private fun UserResponse.toProfileEntity() = ProfileEntity(
-        key = key!!,
+private fun UserResponse.toProfileEntity() = key?.let {
+    ProfileEntity(
+        key = it,
         url = url,
         username = username,
         pictureUrl = pictures?.extra_large,

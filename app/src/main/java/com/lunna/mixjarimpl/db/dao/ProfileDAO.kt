@@ -14,13 +14,13 @@ import com.lunna.mixjarimpl.db.entities.ProfileEntity
 @Dao
 interface ProfileDAO {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-     fun insertProfile(profile:ProfileEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+     fun insertProfile(profile:ProfileEntity?)
 
     @Query("SELECT * FROM profileentity WHERE `key`=:key ")
-     fun getProfileByKey(key: String): ProfileEntity
+     fun getProfileByKey(key: String): ProfileEntity?
 
-    @Query("DELETE FROM PROFILEENTITY")
+    @Query("DELETE FROM profileentity")
      fun deleteAllProfiles()
 
     @Query("DELETE FROM profileentity WHERE `key`=:key ")

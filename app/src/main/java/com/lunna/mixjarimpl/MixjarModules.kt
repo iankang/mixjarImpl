@@ -14,7 +14,6 @@ import org.koin.dsl.module
 
 val databaseModule = module {
     fun provideDB(context: Context): MixjarImplDB {
-        synchronized(this){
                return Room.databaseBuilder(
                     context.applicationContext,
                     MixjarImplDB::class.java,
@@ -22,13 +21,12 @@ val databaseModule = module {
                 )
                     .fallbackToDestructiveMigration()
                     .build()
-        }
     }
 
     fun provideProfileDAO(db:MixjarImplDB): ProfileDAO{
         return db.profileDAO
     }
-    single { provideDB(androidApplication()) }
+    single {provideDB(androidApplication())}
     single {provideProfileDAO(get())}
 }
 

@@ -31,9 +31,8 @@ import com.lunna.mixjarimpl.screens.ProfileScreen
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
-import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.viewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -43,11 +42,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val context = applicationContext
+        val dataStore = DataStoreManager(context)
+        val username = dataStore.username
         setContent {
             MixjarImplTheme {
 
-                AppScreen(mixjarViewModel, feedViewModel)
+                AppScreen(mixjarViewModel, feedViewModel,username)
             }
         }
 
@@ -59,14 +60,13 @@ class MainActivity : ComponentActivity() {
 fun Navigation(
     navController: NavHostController,
     mixjarViewModel: MixjarViewModel,
-    feedViewModel: FeedViewModel
+    feedViewModel: FeedViewModel,
+    username: String?
 ) {
     NavHost(navController, startDestination = NavigationItem.Feed.route) {
 
         composable(NavigationItem.Feed.route) {
-            val context = LocalContext.current
-            val dataStore = DataStoreManager(context)
-            FeedScreen(dataStore.username.collectAsState(initial = "").value, feedViewModel)
+            FeedScreen(username, feedViewModel)
         }
         composable(NavigationItem.Trending.route) {
             TrendingScreen(viewModel = mixjarViewModel)
@@ -78,7 +78,7 @@ fun Navigation(
             GenericScreen("Playlists")
         }
         composable(NavigationItem.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(username)
         }
     }
 }
@@ -203,7 +203,8 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun MainScreen(
     mixjarViewModel: MixjarViewModel,
-    feedViewModel: FeedViewModel
+    feedViewModel: FeedViewModel,
+    username: String?
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -215,7 +216,8 @@ fun MainScreen(
             Navigation(
                 navController,
                 mixjarViewModel,
-                feedViewModel)
+                feedViewModel,
+            username)
         }
     }
 }
@@ -232,15 +234,15 @@ fun BottomNavigationPreview() {
 }
 
 @Composable
-fun AppScreen(mixjarViewModel: MixjarViewModel,
-              feedViewModel: FeedViewModel) {
-    val context = LocalContext.current
-    val dataStore = DataStoreManager(context)
-
-    if (dataStore.username.collectAsState(initial = null).value.isNullOrBlank()) {
+fun AppScreen(
+    mixjarViewModel: MixjarViewModel,
+    feedViewModel: FeedViewModel,
+    username: Flow<String?>
+) {
+    if (username.collectAsState(initial = "").value?.isBlank() == true) {
         LoginScreen(mixjarViewModel)
     } else {
-        MainScreen(mixjarViewModel, feedViewModel)
+        MainScreen(mixjarViewModel, feedViewModel, username.collectAsState(initial = "").value)
     }
 }
 
