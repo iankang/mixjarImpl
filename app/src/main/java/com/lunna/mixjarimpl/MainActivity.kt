@@ -31,7 +31,6 @@ import com.lunna.mixjarimpl.screens.ProfileScreen
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -44,11 +43,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val context = applicationContext
         val dataStore = DataStoreManager(context)
-        val username = dataStore.username
+
         setContent {
             MixjarImplTheme {
-
-                AppScreen(mixjarViewModel, feedViewModel,username)
+                AppScreen(mixjarViewModel, feedViewModel,dataStore)
             }
         }
 
@@ -237,12 +235,13 @@ fun BottomNavigationPreview() {
 fun AppScreen(
     mixjarViewModel: MixjarViewModel,
     feedViewModel: FeedViewModel,
-    username: Flow<String?>
+    dataStore: DataStoreManager
 ) {
-    if (username.collectAsState(initial = "").value?.isBlank() == true) {
+    val username = dataStore.username.collectAsState(null).value
+    if (username.isNullOrEmpty()) {
         LoginScreen(mixjarViewModel)
     } else {
-        MainScreen(mixjarViewModel, feedViewModel, username.collectAsState(initial = "").value)
+        MainScreen(mixjarViewModel, feedViewModel, username)
     }
 }
 

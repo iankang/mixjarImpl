@@ -3,20 +3,12 @@ package com.lunna.mixjarimpl.repository
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.lunna.mixjarimpl.db.MixjarImplDB
-import com.lunna.mixjarimpl.db.dao.ProfileDAO
 import com.lunna.mixjarimpl.db.entities.ProfileEntity
 import com.mixsteroids.mixjar.MixCloud
 import com.mixsteroids.mixjar.models.UserResponse
-import com.mixsteroids.mixjar.utils.Mixcloud
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.withContext
 
 class ProfileRepository(
     private val db: MixjarImplDB
@@ -50,7 +42,7 @@ class ProfileRepository(
     }
 
     fun getProfile(key: String): ProfileEntity? {
-            val userResponse= db.profileDAO.getProfileByKey(key)
+            val userResponse= db.profileDAO.getProfileByUsername(key)
             Log.e("$TAG getProf", userResponse.toString())
             mutableStateOfProfile.value = userResponse
         return userResponse

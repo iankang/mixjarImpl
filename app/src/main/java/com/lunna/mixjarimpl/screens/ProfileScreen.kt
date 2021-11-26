@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +20,8 @@ import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.utilities.LoadingView
 import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
+import com.skydoves.landscapist.CircularReveal
+import com.skydoves.landscapist.glide.GlideImage
 import org.koin.androidx.compose.viewModel
 
 @Composable
@@ -65,12 +68,49 @@ fun UserNameTitle(username:String?){
 fun ProfileComposable(profileEntity: ProfileEntity){
     Column {
         Log.e("profileScreen",profileEntity.toString())
-        UserNameTitle("kangethe")
+        UserNameTitle(profileEntity.username)
     }
 }
 @Composable
+@Preview(name = "day", showBackground = true)
+@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
 fun ProfileComposablePreview(){
     Column {
         UserNameTitle("Kangethe")
     }
+}
+
+@Composable
+@Preview(name = "day", showBackground = true)
+@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
+fun profilePictureImagePreview(){
+   profilePictureImage(profileEntity = ProfileEntity(
+       "key",
+       "https://via.placeholder.com/150",
+       "kangethe",
+       "https://via.placeholder.com/150",
+       "biog",
+       "today",
+       1982,
+       234,
+       828,
+       2345,
+       7736,
+       true,
+       true,
+       "Nairobi",
+       "Kenya",
+       "user"
+   )
+   )
+}
+
+@Composable
+fun profilePictureImage(profileEntity: ProfileEntity){
+    GlideImage(
+//                imageModel = item?.pictures?.extra_large,
+        imageModel = profileEntity.pictureUrl,
+        contentScale = ContentScale.Crop,
+        circularReveal = CircularReveal(duration = 250)
+    )
 }
