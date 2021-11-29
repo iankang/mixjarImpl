@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class FeedViewModel(application: Application):AndroidViewModel(application) {
+class FeedViewModel():ViewModel() {
 
     private val mixCloud = MixCloud()
     private val coroutineScope = CoroutineScope(Dispatchers.IO)

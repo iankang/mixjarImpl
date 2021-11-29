@@ -34,8 +34,12 @@ class ProfileRepository(
      fun addProfile(key:String?){
             if (key != null) {
                 val userResponse:UserResponse? = getProfileOnline(key)
-                Log.e("$TAG,addProf",userResponse.toString())
-                db.profileDAO.insertProfile(userResponse?.toProfileEntity())
+                if(userResponse != null) {
+                    Log.e("$TAG,addProf",userResponse.toString())
+                    db.profileDAO.insertProfile(userResponse.toProfileEntity())
+                }else{
+                    Log.e(TAG,"no profile")
+                }
             }else{
                 Log.e(TAG,"key is empty")
             }

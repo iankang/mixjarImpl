@@ -9,6 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -73,5 +78,23 @@ fun ErrorItem(
         OutlinedButton(onClick = onClickRetry) {
             Text(text = "Try again")
         }
+    }
+}
+
+@Composable
+@Preview()
+fun NotFound(
+    location:String? = "place",
+    user:String? = "user"){
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "$location Not Found for user $user",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            color = MaterialTheme.colors.error
+        )
     }
 }

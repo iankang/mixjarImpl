@@ -27,6 +27,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lunna.mixjarimpl.screens.FeedScreen
+import com.lunna.mixjarimpl.screens.LoginScreen
+import com.lunna.mixjarimpl.screens.MainScreen
 import com.lunna.mixjarimpl.screens.ProfileScreen
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
@@ -35,10 +37,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val mixjarViewModel by viewModels<MixjarViewModel>()
-    private val feedViewModel by viewModels<FeedViewModel>()
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = applicationContext
@@ -46,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MixjarImplTheme {
-                AppScreen(mixjarViewModel, feedViewModel,dataStore)
+                AppScreen(dataStore)
             }
         }
 
@@ -63,6 +61,7 @@ fun Navigation(
 ) {
     NavHost(navController, startDestination = NavigationItem.Feed.route) {
 
+        val profileName= NavigationItem.Profile.route
         composable(NavigationItem.Feed.route) {
             FeedScreen(username, feedViewModel)
         }
@@ -75,9 +74,21 @@ fun Navigation(
         composable(NavigationItem.Playlists.route) {
             GenericScreen("Playlists")
         }
-        composable(NavigationItem.Profile.route) {
+        composable(profileName) {
             ProfileScreen(username)
         }
+
+        composable(
+            route= "$profileName/{followers}",
+            arguments = listOf(
+                navArgument("followers"){
+                    type = NavType.StringType
+                }
+            )
+        ){
+
+        }
+
     }
 }
 
@@ -198,27 +209,6 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-@Composable
-fun MainScreen(
-    mixjarViewModel: MixjarViewModel,
-    feedViewModel: FeedViewModel,
-    username: String?
-) {
-    val navController = rememberNavController()
-    Scaffold(
-        topBar = { TopBar(mixjarViewModel) },
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { innerPadding ->
-        // Apply the padding globally to the whole BottomNavScreensController
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Navigation(
-                navController,
-                mixjarViewModel,
-                feedViewModel,
-            username)
-        }
-    }
-}
 
 
 @Preview(name = "dayBottomNav")
@@ -233,73 +223,17 @@ fun BottomNavigationPreview() {
 
 @Composable
 fun AppScreen(
-    mixjarViewModel: MixjarViewModel,
-    feedViewModel: FeedViewModel,
     dataStore: DataStoreManager
 ) {
     val username = dataStore.username.collectAsState(null).value
     if (username.isNullOrEmpty()) {
-        LoginScreen(mixjarViewModel)
+        LoginScreen()
     } else {
-        MainScreen(mixjarViewModel, feedViewModel, username)
+        MainScreen(username)
     }
 }
 
 
-@Composable
-fun LoginScreen(mixjarViewModel: MixjarViewModel) {
-
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val dataStore = DataStoreManager(context)
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        val userNameState = rememberSaveable { mutableStateOf("") }
-        Surface(
-            border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-            modifier = Modifier.padding(8.dp)
-        ) {
-            TextField(
-                value = userNameState.value,
-                onValueChange = { userNameState.value = it },
-                label = { Text("Username") },
-                placeholder = { Text("Username") },
-            )
-
-        }
-
-
-        Row(horizontalArrangement = Arrangement.End) {
-            Button(
-                modifier = Modifier.padding(8.dp),
-                onClick = {
-                    println("Logged in!")
-                    mixjarViewModel.userNameState.value = userNameState.value
-                    scope.launch {
-                        dataStore.saveToDataStore(username = userNameState.value)
-                    }
-                }
-            ) {
-                Text(
-                    text = "Login",
-                    color = MaterialTheme.colors.secondary
-                )
-            }
-        }
-        if (userNameState.value.isEmpty()) {
-            Text(
-                text = "Please enter mixcloud username!",
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.secondary,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
 
 @Preview(
     showBackground = true,

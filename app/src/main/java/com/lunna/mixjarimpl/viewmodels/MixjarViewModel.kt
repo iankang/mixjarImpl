@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
-class MixjarViewModel(application: Application):AndroidViewModel(application) {
+class MixjarViewModel():ViewModel() {
 
     private val mixCloud = MixCloud()
 

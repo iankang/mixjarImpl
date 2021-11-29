@@ -86,6 +86,7 @@ dependencies {
     implementation "androidx.paging:paging-compose:1.0.0-alpha14"
     implementation 'androidx.paging:paging-common-ktx:3.0.1'
 //    implementation"br.com.devsrsouza.compose.icons.android:ICON_PACK:1.0.0"
+    implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
     // Koin main features for Android
     implementation "io.insert-koin:koin-android:$koin_version"
