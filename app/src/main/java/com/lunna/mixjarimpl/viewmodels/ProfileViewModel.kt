@@ -24,20 +24,15 @@ class ProfileViewModel(private val profileRepository: ProfileRepository):ViewMod
     val isLoading:StateFlow<Boolean> = _isLoading
 
 
-    fun addProfileByKey(key:String){
+    fun getProfileByKey(key:String){
         coroutineScope.launch {
             _isLoading.value = true
             profileRepository.addProfile(key)
             val userResponse = profileRepository.getProfile(key)
+            Log.e("$TAG, profVM",userResponse.toString())
             _profileMutableState.value = userResponse
             _isLoading.value = false
         }
     }
 
-    fun getProfileByKey(key:String){
-        coroutineScope.launch {
-
-            Log.e(TAG+"profVM",profileMutableState.value.toString())
-        }
-    }
 }

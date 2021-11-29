@@ -25,7 +25,7 @@ class ProfileRepository(
     val mutableStateOfProfile:MutableState<ProfileEntity?> = mutableStateOf(null)
 
 
-     fun getProfileOnline(key:String): UserResponse? {
+     private fun getProfileOnline(key:String): UserResponse? {
         val userResponse:UserResponse? = mixCloud.getUser(key)
         Log.e("$TAG getProfileOnline",userResponse.toString())
        return userResponse
@@ -34,7 +34,7 @@ class ProfileRepository(
      fun addProfile(key:String?){
             if (key != null) {
                 val userResponse:UserResponse? = getProfileOnline(key)
-                Log.e(TAG,userResponse.toString())
+                Log.e("$TAG,addProf",userResponse.toString())
                 db.profileDAO.insertProfile(userResponse?.toProfileEntity())
             }else{
                 Log.e(TAG,"key is empty")

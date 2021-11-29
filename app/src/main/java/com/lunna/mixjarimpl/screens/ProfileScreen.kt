@@ -2,7 +2,7 @@ package com.lunna.mixjarimpl.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.util.Log
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,24 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.HorizontalAlignmentLine
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lunna.mixjarimpl.R
 import com.lunna.mixjarimpl.db.entities.ProfileEntity
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
-import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.utilities.LoadingView
 import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
 import com.skydoves.landscapist.CircularReveal
@@ -52,7 +46,7 @@ fun ProfileScreen(username: String?){
     val profileViewModel by viewModel<ProfileViewModel>()
 
     if (username != null) {
-        profileViewModel.addProfileByKey(username)
+        profileViewModel.getProfileByKey(username)
     }
     val isLoading by profileViewModel.isLoading.collectAsState()
     val profileEntity by profileViewModel.profileMutableState.collectAsState()
@@ -71,12 +65,29 @@ fun ProfileScreen(username: String?){
 fun UserNameTitle(username:String?){
     Text(
         text = username!!,
-        modifier = Modifier.fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colors.onBackground,
         fontSize = 24.sp
     )
+}
+
+@Composable
+fun bioText(bio: String?){
+    Row {
+        Text(
+            text = bio ?: "",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.primary,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
 }
 
 @Composable
@@ -91,14 +102,19 @@ fun ProfileComposable(profileEntity: ProfileEntity){
         Log.e("profileScreen",profileEntity.toString())
         profilePictureImage(profileEntity)
         UserNameTitle(profileEntity.username)
+        bioText(profileEntity.biog)
+        statsRow(profileEntity.followingCount.toString(),profileEntity.followerCount.toString())
     }
 }
 @Composable
 @Preview(name = "day", showBackground = true)
 @Preview(name = "night", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
 fun ProfileComposablePreview(){
-    Column {
-        UserNameTitle("Kangethe")
+    MixjarImplTheme {
+        Column {
+            UserNameTitle("Kangethe")
+            bioText("internet sensation")
+        }
     }
 }
 
@@ -121,51 +137,80 @@ fun profilePictureImage(profileEntity: ProfileEntity){
 @Preview(name = "statsday", showBackground = true)
 @Preview(name = "statsnight", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-fun statsRow(){
+fun statsRow(followingText:String = "0",
+             followersText:String = "0"){
     MixjarImplTheme {
         Row(
-            modifier = Modifier
-                .size(width = 150.dp, height = 150.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically,
+
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.CenterVertically),
-                backgroundColor = MaterialTheme.colors.onPrimary,
-                contentColor = MaterialTheme.colors.primary
+                    .padding(12.dp),
+                contentColor = MaterialTheme.colors.onBackground,
+                elevation = 12.dp
             ) {
-                Text(
-                    modifier = Modifier
-                    .fillMaxHeight()
-                        .align(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center,
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontWeight = FontWeight.Black,
-                                fontSize = 16.sp,
-                                color = Color.DarkGray,
-                            )
-                        ) {
-                            append("Listens\n")
-                        }
-                        withStyle(
-                            style = SpanStyle(
-                                fontWeight = FontWeight.Light,
-                                fontSize = 12.sp,
-                                color = Color.Gray
-                            )
-                        ) {
-                            append("1,850")
-                        }
-                    },
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colors.onBackground,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontStyle = FontStyle.Normal
+                                )
+                            ) {
+                                append("Following\n")
+                            }
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colors.onBackground,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontStyle = FontStyle.Normal
+                                )
+                            ) {
+                                append(followingText)
+                            }
+                        },
+                        textAlign = TextAlign.Center
+                    )
+            }
 
-                lineHeight = 36.sp,
-                style = TextStyle(
+            Card(
+                modifier = Modifier
+                    .padding(12.dp),
+                contentColor = MaterialTheme.colors.onBackground,
+                elevation = 12.dp
+            ) {
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colors.onBackground,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontStyle = FontStyle.Normal
+                                )
+                            ) {
+                                append("Followers\n")
+                            }
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colors.onBackground,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontStyle = FontStyle.Normal,
 
-                )
-                )
+                                )
+                            ) {
+                                append(followersText)
+                            }
+                        },
+                        textAlign = TextAlign.Center
+                    )
             }
         }
     }
