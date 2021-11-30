@@ -2,34 +2,24 @@ package com.lunna.mixjarimpl
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.lunna.mixjarimpl.screens.FeedScreen
-import com.lunna.mixjarimpl.screens.LoginScreen
-import com.lunna.mixjarimpl.screens.MainScreen
-import com.lunna.mixjarimpl.screens.ProfileScreen
+import com.lunna.mixjarimpl.screens.*
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
@@ -52,6 +42,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun Navigation(
     navController: NavHostController,
@@ -75,39 +66,42 @@ fun Navigation(
             GenericScreen("Playlists")
         }
         composable(profileName) {
-            ProfileScreen(username)
+            ProfileScreen(username){
+//                navigateToFollowers(
+//                    navController,
+//                    "$profileName/followers"
+//                )
+                Log.e("clicked",it)
+            }
         }
 
+//        composable(
+//            route= "$profileName/{followers}",
+//            arguments = listOf(
+//                navArgument("followers"){
+//                    type = NavType.StringType
+//                }
+//            )
+//        ){ entry ->
+//            val followers = entry.arguments?.getString("followers")
+//
+//        }
         composable(
-            route= "$profileName/{followers}",
-            arguments = listOf(
-                navArgument("followers"){
-                    type = NavType.StringType
-                }
-            )
+            route= "$profileName/followers"
         ){
-
+            FollowersScreen()
         }
 
     }
 }
-
-@Composable
-fun TopBar(mixjarViewModel: MixjarViewModel) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                fontSize = 18.sp
-            )
-        },
-        backgroundColor = MaterialTheme.colors.primary,
-        contentColor = Color.White,
-        actions = {
-            TopAppBarDropdownMenu()
-        }
-    )
+private fun navigateToFollowers(
+    navController: NavHostController,
+    route: String
+) {
+    navController.navigate(route)
 }
+
+
 
 @Composable
 fun TopAppBarDropdownMenu() {

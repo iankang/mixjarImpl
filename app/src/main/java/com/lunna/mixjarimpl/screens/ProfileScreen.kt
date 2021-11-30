@@ -44,8 +44,12 @@ fun ProfileScreenPreview() {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
-fun ProfileScreen(username: String?) {
+fun ProfileScreen(
+    username: String?,
+    onClickListener : (string:String) -> Unit
+) {
     val profileViewModel by viewModel<ProfileViewModel>()
 
     if (username != null) {
@@ -58,7 +62,7 @@ fun ProfileScreen(username: String?) {
             isLoading -> LoadingView(
                 modifier = Modifier.fillMaxSize()
             )
-            else -> profileEntity?.let { ProfileComposable(it) } ?: NotFound(
+            else -> profileEntity?.let { ProfileComposable(it,onClickListener) } ?: NotFound(
                 "Profile Screen",
                 username
             )
@@ -96,8 +100,12 @@ fun bioText(bio: String?) {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
-fun ProfileComposable(profileEntity: ProfileEntity) {
+fun ProfileComposable(
+    profileEntity: ProfileEntity,
+    onClickListener : (string:String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,7 +122,8 @@ fun ProfileComposable(profileEntity: ProfileEntity) {
             profileEntity.followerCount.toString(),
             profileEntity.favoriteCount.toString(),
             profileEntity.listenCount.toString(),
-            profileEntity.cloudCastCount ?: 0
+            profileEntity.cloudCastCount ?: 0,
+            onClickListener
         )
     }
 }
@@ -148,15 +157,15 @@ fun profilePictureImage(profileEntity: ProfileEntity) {
 }
 
 
-@Preview(name = "statsday", showBackground = true)
-@Preview(name = "statsnight", uiMode = UI_MODE_NIGHT_YES, showBackground = true)
+@ExperimentalMaterialApi
 @Composable
 fun statsRow(
     followingText: String = "0",
     followersText: String = "0",
     likesText: String = "0",
     listensText: String = "0",
-    cloudCastCount: Int = 0
+    cloudCastCount: Int = 0,
+    onClickListener : (string:String) -> Unit
 ) {
     MixjarImplTheme {
         Column {
@@ -168,8 +177,16 @@ fun statsRow(
                 verticalAlignment = Alignment.CenterVertically,
 
                 ) {
-                statCard("Following", followingText)
-                statCard("Followers", followersText)
+                statCard(
+                    "Following",
+                    followingText,
+                    onClickListener= {onClickListener("following")}
+                )
+                statCard(
+                    "Followers",
+                    followersText,
+                    onClickListener= {onClickListener("followers")}
+                )
 
             }
 
@@ -185,7 +202,8 @@ fun statsRow(
                     statCard(
                         "shows",
                         cloudCastCount.toString(),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        onClickListener= {onClickListener("shows")}
                     )
 
                 }
@@ -197,25 +215,37 @@ fun statsRow(
                 verticalAlignment = Alignment.CenterVertically,
 
                 ) {
-                statCard("Likes", likesText)
-                statCard("Listens", listensText)
+                statCard(
+                    "Likes",
+                    likesText,
+                    onClickListener= {onClickListener("likes")}
+                )
+                statCard(
+                    "Listens",
+                    listensText,
+                    onClickListener= {onClickListener("listens")}
+                )
 
             }
         }
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun statCard(
     title: String? = "title",
     value: String? = "0",
     modifier: Modifier = Modifier
-        .padding(18.dp)
+        .padding(18.dp),
+    onClickListener : (string:String?) -> Unit
 ) {
     Card(
+        onClick = {onClickListener("following")},
         modifier = modifier,
         contentColor = MaterialTheme.colors.onBackground,
-        elevation = 12.dp
+        elevation = 12.dp,
+
     ) {
         Text(
             buildAnnotatedString {
