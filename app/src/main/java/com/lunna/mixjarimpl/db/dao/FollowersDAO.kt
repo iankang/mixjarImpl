@@ -1,5 +1,7 @@
 package com.lunna.mixjarimpl.db.dao
 
+
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -20,12 +22,24 @@ interface FollowersDAO {
     @Query("SELECT * FROM followersentity")
     fun getAllFollowers():List<FollowersEntity?>
 
-    @Query("SELECT * FROM followersentity WHERE :mainUser = mainUser")
+    @Query("SELECT * FROM followersentity WHERE mainUser = :mainUser")
     fun getAllFollowersByMainUser(mainUser:String?):List<FollowersEntity>
 
-    @Query("SELECT * FROM followersentity WHERE :username = username")
+    @Query("SELECT * FROM followersentity WHERE username = :username")
     fun getFollowerByUsername(username:String):FollowersEntity?
+
+//    @Query("SELECT * FROM followersentity WHERE username = :username")
+//    fun getFollowerByUsernamePaged(username:String):PagingSource<Int,FollowersEntity>
 
     @Query("DELETE FROM followersentity")
     fun deleteAll()
+
+    @Query("DELETE FROM followersentity WHERE mainUser = :mainUser")
+    fun deleteAllFromUsername(mainUser: String)
+
+    @Query("SELECT COUNT(*) FROM followersentity")
+    fun count():Int?
+
+    @Query("SELECT COUNT(*) FROM followersentity WHERE mainUser=:mainUser")
+    fun countByMainUser(mainUser:String?):Int?
 }

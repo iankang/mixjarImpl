@@ -114,7 +114,7 @@ fun ProfileComposable(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Log.e("profileScreen", profileEntity.toString())
-        profilePictureImage(profileEntity)
+        followerProfileImage(profileEntity)
         UserNameTitle(profileEntity.username)
         bioText(profileEntity.biog)
         statsRow(
@@ -141,7 +141,7 @@ fun ProfileComposablePreview() {
 }
 
 @Composable
-fun profilePictureImage(profileEntity: ProfileEntity) {
+fun followerProfileImage(profileEntity: ProfileEntity) {
     GlideImage(
 //                imageModel = item?.pictures?.extra_large,
         imageModel = profileEntity.pictureUrl,

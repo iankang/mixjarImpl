@@ -5,5 +5,6 @@ enum class CardType {
     FOLLOWERS,
     LIKES,
     LISTENS,
-    CLOUDCASTS
+    CLOUDCASTS,
+    NULL
 }

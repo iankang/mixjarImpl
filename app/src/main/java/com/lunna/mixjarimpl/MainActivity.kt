@@ -91,7 +91,11 @@ fun Navigation(
         composable(
             route= "$profileName/${CardType.FOLLOWERS}"
         ){
-            FollowersScreen()
+            FollowersScreen(username){
+//               navigateToProfile(navController,profileName)
+//                navigateToDetailsScreen(navController,profileName,CardType.NULL)
+                Log.e("profile selected",it?.toString())
+            }
         }
         composable(
             route= "$profileName/${CardType.FOLLOWING}"
@@ -124,6 +128,14 @@ private fun navigateToDetailsScreen(
     val route = "$baseValue/$specificDetail"
     navController.navigate(route)
 }
+
+private fun navigateToProfile(
+    navController: NavHostController,
+    route:String
+){
+    navController.navigate(route)
+}
+
 
 
 

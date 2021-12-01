@@ -3,11 +3,14 @@ package com.lunna.mixjarimpl
 import android.content.Context
 import androidx.room.Room
 import com.lunna.mixjarimpl.db.MixjarImplDB
+import com.lunna.mixjarimpl.db.dao.FollowersDAO
+import com.lunna.mixjarimpl.db.dao.FollowingDAO
 import com.lunna.mixjarimpl.db.dao.ProfileDAO
+import com.lunna.mixjarimpl.pagingSources.FollowersSource
+import com.lunna.mixjarimpl.repository.FollowersRepository
+import com.lunna.mixjarimpl.repository.FollowingRepository
 import com.lunna.mixjarimpl.repository.ProfileRepository
-import com.lunna.mixjarimpl.viewmodels.FeedViewModel
-import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
-import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
+import com.lunna.mixjarimpl.viewmodels.*
 import com.mixsteroids.mixjar.MixCloud
 import com.mixsteroids.mixjar.utils.Mixcloud
 import org.koin.android.ext.koin.androidApplication
@@ -28,8 +31,16 @@ val databaseModule = module {
     fun provideProfileDAO(db:MixjarImplDB): ProfileDAO{
         return db.profileDAO
     }
+    fun provideFollowingDAO(db:MixjarImplDB):FollowingDAO{
+        return db.followingDAO
+    }
+    fun provideFollowersDAO(db:MixjarImplDB):FollowersDAO{
+        return db.followersDAO
+    }
     single {provideDB(androidApplication())}
     single {provideProfileDAO(get())}
+    single { provideFollowingDAO(get()) }
+    single { provideFollowersDAO(get()) }
 }
 
 val repositoryModule = module {
@@ -37,7 +48,17 @@ val repositoryModule = module {
     fun provideProfileRepository(db: MixjarImplDB):ProfileRepository{
         return ProfileRepository(db)
     }
+
+    fun provideFollowerRepository(db:MixjarImplDB): FollowersRepository{
+        return FollowersRepository(db)
+    }
+
+    fun provideFollowingRepository(db:MixjarImplDB):FollowingRepository{
+        return FollowingRepository(db)
+    }
     single { provideProfileRepository(get()) }
+    single { provideFollowerRepository(get()) }
+    single { provideFollowingRepository(get()) }
 }
 
 val viewModelModule = module {
@@ -50,5 +71,11 @@ val viewModelModule = module {
     }
     viewModel {
         FeedViewModel()
+    }
+    viewModel {
+        FollowingViewModel(get())
+    }
+    viewModel {
+        FollowersViewModel(get())
     }
 }
