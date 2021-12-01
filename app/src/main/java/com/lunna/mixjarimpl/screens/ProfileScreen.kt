@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lunna.mixjarimpl.db.entities.ProfileEntity
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
+import com.lunna.mixjarimpl.utilities.CardType
 import com.lunna.mixjarimpl.utilities.LoadingView
 import com.lunna.mixjarimpl.utilities.NotFound
 import com.lunna.mixjarimpl.viewmodels.ProfileViewModel
@@ -48,7 +48,7 @@ fun ProfileScreenPreview() {
 @Composable
 fun ProfileScreen(
     username: String?,
-    onClickListener : (string:String) -> Unit
+    onClickListener : (cardType:CardType) -> Unit
 ) {
     val profileViewModel by viewModel<ProfileViewModel>()
 
@@ -62,7 +62,7 @@ fun ProfileScreen(
             isLoading -> LoadingView(
                 modifier = Modifier.fillMaxSize()
             )
-            else -> profileEntity?.let { ProfileComposable(it,onClickListener) } ?: NotFound(
+            else ->  profileEntity?.let { ProfileComposable(it,onClickListener) } ?: NotFound(
                 "Profile Screen",
                 username
             )
@@ -104,7 +104,7 @@ fun bioText(bio: String?) {
 @Composable
 fun ProfileComposable(
     profileEntity: ProfileEntity,
-    onClickListener : (string:String) -> Unit
+    onClickListener : (card:CardType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -165,7 +165,7 @@ fun statsRow(
     likesText: String = "0",
     listensText: String = "0",
     cloudCastCount: Int = 0,
-    onClickListener : (string:String) -> Unit
+    onClickListener : (card:CardType) -> Unit
 ) {
     MixjarImplTheme {
         Column {
@@ -180,12 +180,14 @@ fun statsRow(
                 statCard(
                     "Following",
                     followingText,
-                    onClickListener= {onClickListener("following")}
+                    cardType = CardType.FOLLOWING,
+                    onClickListener= {onClickListener(CardType.FOLLOWING)}
                 )
                 statCard(
                     "Followers",
                     followersText,
-                    onClickListener= {onClickListener("followers")}
+                    cardType = CardType.FOLLOWERS,
+                    onClickListener= {onClickListener(CardType.FOLLOWERS)}
                 )
 
             }
@@ -203,7 +205,8 @@ fun statsRow(
                         "shows",
                         cloudCastCount.toString(),
                         modifier = Modifier.fillMaxWidth(),
-                        onClickListener= {onClickListener("shows")}
+                        cardType = CardType.CLOUDCASTS,
+                        onClickListener= {onClickListener(CardType.CLOUDCASTS)}
                     )
 
                 }
@@ -218,12 +221,14 @@ fun statsRow(
                 statCard(
                     "Likes",
                     likesText,
-                    onClickListener= {onClickListener("likes")}
+                    cardType = CardType.LIKES,
+                    onClickListener= {onClickListener(CardType.LIKES)}
                 )
                 statCard(
                     "Listens",
                     listensText,
-                    onClickListener= {onClickListener("listens")}
+                    cardType = CardType.LISTENS,
+                    onClickListener= {onClickListener(CardType.LISTENS)}
                 )
 
             }
@@ -238,10 +243,11 @@ fun statCard(
     value: String? = "0",
     modifier: Modifier = Modifier
         .padding(18.dp),
-    onClickListener : (string:String?) -> Unit
+    cardType:CardType,
+    onClickListener : (card:CardType) -> Unit
 ) {
     Card(
-        onClick = {onClickListener("following")},
+        onClick = {onClickListener(cardType)},
         modifier = modifier,
         contentColor = MaterialTheme.colors.onBackground,
         elevation = 12.dp,

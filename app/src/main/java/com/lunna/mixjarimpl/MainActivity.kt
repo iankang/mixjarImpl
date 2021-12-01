@@ -20,6 +20,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.lunna.mixjarimpl.screens.*
+import com.lunna.mixjarimpl.utilities.CardType
 import com.lunna.mixjarimpl.utilities.DataStoreManager
 import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = applicationContext
@@ -67,11 +69,11 @@ fun Navigation(
         }
         composable(profileName) {
             ProfileScreen(username){
-//                navigateToFollowers(
-//                    navController,
-//                    "$profileName/followers"
-//                )
-                Log.e("clicked",it)
+                navigateToDetailsScreen(
+                    navController,
+                    "$profileName",
+                    it
+                )
             }
         }
 
@@ -87,17 +89,39 @@ fun Navigation(
 //
 //        }
         composable(
-            route= "$profileName/followers"
+            route= "$profileName/${CardType.FOLLOWERS}"
         ){
             FollowersScreen()
+        }
+        composable(
+            route= "$profileName/${CardType.FOLLOWING}"
+        ){
+            FollowingScreen()
+        }
+        composable(
+            route= "$profileName/${CardType.LIKES}"
+        ){
+            LikesScreen()
+        }
+        composable(
+            route= "$profileName/${CardType.LISTENS}"
+        ){
+            ListensScreen()
+        }
+        composable(
+            route= "$profileName/${CardType.CLOUDCASTS}"
+        ){
+            CloudCastsScreen()
         }
 
     }
 }
-private fun navigateToFollowers(
+private fun navigateToDetailsScreen(
     navController: NavHostController,
-    route: String
+    baseValue:String,
+    specificDetail: CardType
 ) {
+    val route = "$baseValue/$specificDetail"
     navController.navigate(route)
 }
 
@@ -215,6 +239,7 @@ fun BottomNavigationPreview() {
 
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun AppScreen(
     dataStore: DataStoreManager

@@ -2,10 +2,7 @@ package com.lunna.mixjarimpl.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +17,7 @@ import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
 import org.koin.androidx.compose.viewModel
 
+@ExperimentalMaterialApi
 @Composable
 fun MainScreen(
     username: String?
