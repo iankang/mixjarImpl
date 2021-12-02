@@ -16,6 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -28,26 +29,28 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import org.koin.androidx.compose.viewModel
 
+@ExperimentalPagingApi
 @Composable
 //@Preview(name = "day")
 //@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
-fun FollowersScreen(username: String?,onClick: (userFollowersData: UserFollowersData) -> Unit){
+fun FollowersScreen(username: String?,onClick: (userFollowersData: FollowersEntity) -> Unit){
     MixjarImplTheme {
         followerListItems(username,onClick)
     }
 }
 
+@ExperimentalPagingApi
 @Composable
 fun followerListItems(
     username:String?,
-    onClick: (userFollowersData:UserFollowersData) -> Unit){
+    onClick: (userFollowersData:FollowersEntity) -> Unit){
 
     val followersViewModel by viewModel<FollowersViewModel>()
 
-    val items: LazyPagingItems<UserFollowersData> = username?.let { followersViewModel.followers(it).collectAsLazyPagingItems()}!!
+    val items: LazyPagingItems<FollowersEntity> = username?.let { followersViewModel.followers(it).collectAsLazyPagingItems()}!!
 
     LazyColumn {
-        items(items){value: UserFollowersData? ->
+        items(items){value: FollowersEntity? ->
             Row(
                 modifier = Modifier.fillParentMaxWidth()
                     .height(100.dp)
@@ -64,7 +67,7 @@ fun followerListItems(
             horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                followerImage(value?.pictures?.extra_large)
+                followerImage(value?.pictureUrl)
                 Text(
                     text = value?.name!!
                 )

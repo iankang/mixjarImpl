@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import com.lunna.mixjarimpl.db.MixjarImplDB
 import com.lunna.mixjarimpl.db.dao.FollowersDAO
+import com.lunna.mixjarimpl.db.dao.FollowersPagingDAO
 import com.lunna.mixjarimpl.db.dao.FollowingDAO
 import com.lunna.mixjarimpl.db.dao.ProfileDAO
+import com.lunna.mixjarimpl.db.entities.FollowersEntity
 import com.lunna.mixjarimpl.pagingSources.FollowersSource
+import com.lunna.mixjarimpl.repository.FollowersPagingRepository
 import com.lunna.mixjarimpl.repository.FollowersRepository
 import com.lunna.mixjarimpl.repository.FollowingRepository
 import com.lunna.mixjarimpl.repository.ProfileRepository
@@ -37,10 +40,14 @@ val databaseModule = module {
     fun provideFollowersDAO(db:MixjarImplDB):FollowersDAO{
         return db.followersDAO
     }
+    fun provideFollowersPagingDAO(db:MixjarImplDB):FollowersPagingDAO{
+        return db.followersPagingDAO
+    }
     single {provideDB(androidApplication())}
     single {provideProfileDAO(get())}
     single { provideFollowingDAO(get()) }
     single { provideFollowersDAO(get()) }
+    single { provideFollowersPagingDAO(get()) }
 }
 
 val repositoryModule = module {
@@ -56,9 +63,14 @@ val repositoryModule = module {
     fun provideFollowingRepository(db:MixjarImplDB):FollowingRepository{
         return FollowingRepository(db)
     }
+
+    fun provideFollowersPagingRepository(db:MixjarImplDB):FollowersPagingRepository{
+        return FollowersPagingRepository(db)
+    }
     single { provideProfileRepository(get()) }
     single { provideFollowerRepository(get()) }
     single { provideFollowingRepository(get()) }
+    single {provideFollowersPagingRepository(get())}
 }
 
 val viewModelModule = module {
@@ -76,6 +88,6 @@ val viewModelModule = module {
         FollowingViewModel(get())
     }
     viewModel {
-        FollowersViewModel(get())
+        FollowersViewModel(get(),get())
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -106,25 +107,28 @@ fun ProfileComposable(
     profileEntity: ProfileEntity,
     onClickListener : (card:CardType) -> Unit
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Log.e("profileScreen", profileEntity.toString())
-        followerProfileImage(profileEntity)
-        UserNameTitle(profileEntity.username)
-        bioText(profileEntity.biog)
-        statsRow(
-            profileEntity.followingCount.toString(),
-            profileEntity.followerCount.toString(),
-            profileEntity.favoriteCount.toString(),
-            profileEntity.listenCount.toString(),
-            profileEntity.cloudCastCount ?: 0,
-            onClickListener
-        )
+        item {
+            Log.e("profileScreen", profileEntity.toString())
+            followerProfileImage(profileEntity)
+            UserNameTitle(profileEntity.username)
+            bioText(profileEntity.biog)
+            statsRow(
+                profileEntity.followingCount.toString(),
+                profileEntity.followerCount.toString(),
+                profileEntity.favoriteCount.toString(),
+                profileEntity.listenCount.toString(),
+                profileEntity.cloudCastCount ?: 0,
+                onClickListener
+            )
+        }
+
     }
 }
 

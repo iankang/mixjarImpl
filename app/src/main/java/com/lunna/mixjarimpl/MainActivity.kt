@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.paging.ExperimentalPagingApi
 import com.lunna.mixjarimpl.screens.*
 import com.lunna.mixjarimpl.utilities.CardType
 import com.lunna.mixjarimpl.utilities.DataStoreManager
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalPagingApi
 @ExperimentalMaterialApi
 @Composable
 fun Navigation(
