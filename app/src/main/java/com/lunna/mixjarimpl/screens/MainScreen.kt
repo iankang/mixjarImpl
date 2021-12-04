@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.ExperimentalPagingApi
 import com.lunna.mixjarimpl.BottomNavigationBar
 import com.lunna.mixjarimpl.Navigation
 import com.lunna.mixjarimpl.R
@@ -17,7 +18,9 @@ import com.lunna.mixjarimpl.viewmodels.FeedViewModel
 import com.lunna.mixjarimpl.viewmodels.MixjarViewModel
 import org.koin.androidx.compose.viewModel
 
+
 @ExperimentalMaterialApi
+@OptIn(ExperimentalPagingApi::class)
 @Composable
 fun MainScreen(
     username: String?

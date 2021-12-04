@@ -23,7 +23,7 @@ interface FollowersDAO {
     fun getAllFollowers():List<FollowersEntity?>
 
     @Query("SELECT * FROM followersentity WHERE mainUser = :mainUser")
-    fun getAllFollowersByMainUser(mainUser:String?):List<FollowersEntity>
+    fun getAllFollowersByMainUser(mainUser:String?):PagingSource<Int,FollowersEntity>
 
     @Query("SELECT * FROM followersentity WHERE username = :username")
     fun getFollowerByUsername(username:String):FollowersEntity?

@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    @ExperimentalPagingApi
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -253,6 +254,7 @@ fun BottomNavigationPreview() {
 
 }
 
+@ExperimentalPagingApi
 @ExperimentalMaterialApi
 @Composable
 fun AppScreen(

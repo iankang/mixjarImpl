@@ -1,6 +1,9 @@
 package com.lunna.mixjarimpl.pagingSources
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -11,6 +14,9 @@ import com.lunna.mixjarimpl.repository.FollowersPagingRepository
 import com.lunna.mixjarimpl.repository.FollowersRepository
 import com.lunna.mixjarimpl.repository.toFollowersEntity
 import com.mixsteroids.mixjar.MixCloud
+import com.mixsteroids.mixjar.models.UserFollowersResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.InvalidObjectException
 import java.lang.Exception
 
@@ -29,7 +35,7 @@ class FollowersRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, FollowersEntity>
     ): MediatorResult {
-        try{
+        return try{
             Log.d("$TAG start","startingMediator")
             val pageKeyData = getKeyPageData(loadType, state)
             Log.d("$TAG pageKeyData",pageKeyData.toString())
@@ -41,28 +47,36 @@ class FollowersRemoteMediator(
                     pageKeyData as Int
                 }
             }
-            val response = mixCloud.getUserFollowers(username = username,page = page)
-            Log.d("$TAG response",response.toString())
-            val isEndOfList = response?.paging?.next == null
 
-            if(loadType == LoadType.REFRESH){
-                followersPagingRepository.deleteAll()
-                followersRepository.deleteAllFollowers()
-            }
-            val prevKey = if (page == DEFAULT_PAGE_INDEX) null else page - 1
-            val nextKey = if (isEndOfList) null else page + 1
-            val keys = response?.data?.map {
-                Log.d("$TAG keys ",it.toString())
-                FollowersPagingEntity(key = it?.key!!, previousKey =prevKey,nextKey = nextKey)
+
+
+            withContext(Dispatchers.IO){
+                Log.d("$TAG page",page.toString())
+                val response = mixCloud.getUserFollowers(username = username,page = page)
+                Log.d("$TAG response",response.toString())
+                val isEndOfList = response?.paging?.next == null
+
+                if(loadType == LoadType.REFRESH){
+                    followersPagingRepository.deleteAll()
+                    followersRepository.deleteAllFollowers()
+                }
+                val prevKey = if (page == DEFAULT_PAGE_INDEX) null else page - 1
+                val nextKey = if (isEndOfList) null else page + 1
+                val keys = response?.data?.map {
+                    Log.d("$TAG keys ",it.toString())
+                    FollowersPagingEntity(key = it?.key!!, previousKey = prevKey,nextKey = nextKey)
+                }
+
+                if (keys != null) {
+                    followersPagingRepository.insertKeys(keys)
+                }
+                response?.data?.forEach {
+                    followersRepository.addFollower(it?.toFollowersEntity(username))
+                }
+                MediatorResult.Success(endOfPaginationReached = isEndOfList)
             }
 
-            if (keys != null) {
-                followersPagingRepository.insertKeys(keys)
-            }
-            response?.data?.forEach {
-                followersRepository.addFollower(it?.toFollowersEntity(username))
-            }
-            return MediatorResult.Success(endOfPaginationReached = isEndOfList)
+
         }catch (e: Exception){
             return MediatorResult.Error(e)
         }
@@ -95,20 +109,19 @@ class FollowersRemoteMediator(
     private fun getKeyPageData(loadType: LoadType, state: PagingState<Int, FollowersEntity>): Any? {
         return when (loadType) {
             LoadType.REFRESH -> {
-//                val remoteKeys = getClosestRemoteKey(state)
-//                remoteKeys?.nextKey?.minus(1) ?: DEFAULT_PAGE_INDEX
-                null
+                Log.d("$TAG: refresh","refresh")
+                    val remoteKeys = getClosestRemoteKey(state)
+                    remoteKeys?.nextKey?.minus(1) ?: DEFAULT_PAGE_INDEX
             }
             LoadType.APPEND -> {
+                Log.d("$TAG: append","append")
                 val remoteKeys = getLastRemoteKey(state)
                     ?: throw InvalidObjectException("Remote key should not be null for $loadType")
-                remoteKeys.nextKey
+                remoteKeys.nextKey ?: 0
             }
             LoadType.PREPEND -> {
-                val remoteKeys = getFirstRemoteKey(state)
-                    ?: throw InvalidObjectException("Invalid state, key should not be null")
-                //end of list condition reached
-                remoteKeys.previousKey ?: return MediatorResult.Success(endOfPaginationReached = true)
+                Log.d("$TAG: append","append")
+                MediatorResult.Success(endOfPaginationReached = true)
             }
         }
     }

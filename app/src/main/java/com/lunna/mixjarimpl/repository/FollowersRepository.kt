@@ -21,7 +21,7 @@ class FollowersRepository(
         return db.followersDAO.getAllFollowers()
     }
 
-    fun getAllFollowersByMainUser(mainUser:String?):List<FollowersEntity?>{
+    fun getAllFollowersByMainUser(mainUser:String?):PagingSource<Int,FollowersEntity>{
         return db.followersDAO.getAllFollowersByMainUser(mainUser)
     }
 

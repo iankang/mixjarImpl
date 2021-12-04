@@ -25,7 +25,7 @@ class FollowersViewModel(
             config = PagingConfig(pageSize = 20, prefetchDistance = 10, enablePlaceholders = false, initialLoadSize = 20),
             initialKey = 0,
             remoteMediator = FollowersRemoteMediator(username,followersRepository,followersPagingRepository),
-            pagingSourceFactory = {FollowersSource(username)}
+            pagingSourceFactory = {followersRepository.getAllFollowersByMainUser(username)}
         ).flow
     }
 
