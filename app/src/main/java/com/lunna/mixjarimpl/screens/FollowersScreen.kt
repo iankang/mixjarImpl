@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +29,7 @@ import com.lunna.mixjarimpl.viewmodels.FollowersViewModel
 import com.mixsteroids.mixjar.models.UserFollowersData
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 
 @ExperimentalPagingApi
@@ -50,7 +53,11 @@ fun followerListItems(
     val items: LazyPagingItems<FollowersEntity> = username?.let { followersViewModel.followers(it).collectAsLazyPagingItems()}!!
 
     LazyColumn {
-        items(items){value: FollowersEntity? ->
+
+        items(items = items,
+            key = {follower: FollowersEntity ->
+                follower.key
+            }){value: FollowersEntity? ->
             Row(
                 modifier = Modifier.fillParentMaxWidth()
                     .height(100.dp)
@@ -74,6 +81,7 @@ fun followerListItems(
             }
         }
     }
+
 
 }
 

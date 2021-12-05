@@ -115,8 +115,7 @@ class FollowersRemoteMediator(
         return when (loadType) {
             LoadType.REFRESH -> {
                 Log.d("$TAG: refresh","refresh")
-                    val remoteKeys = getClosestRemoteKey(state)
-                    remoteKeys?.nextKey?.minus(1) ?: DEFAULT_PAGE_INDEX
+                0
             }
             LoadType.APPEND -> {
                 Log.d("$TAG: append","append")
@@ -124,8 +123,8 @@ class FollowersRemoteMediator(
                     ?: throw InvalidObjectException("Remote key should not be null for $loadType")
                 remoteKeys.nextKey ?: 0
             }
+
             LoadType.PREPEND -> {
-                Log.d("$TAG: append","append")
                 MediatorResult.Success(endOfPaginationReached = true)
             }
         }

@@ -80,17 +80,19 @@ fun Navigation(
             }
         }
 
-//        composable(
-//            route= "$profileName/{followers}",
-//            arguments = listOf(
-//                navArgument("followers"){
-//                    type = NavType.StringType
-//                }
-//            )
-//        ){ entry ->
-//            val followers = entry.arguments?.getString("followers")
-//
-//        }
+        composable(
+            route= "$profileName/{username}",
+            arguments = listOf(
+                navArgument("username"){
+                    type = NavType.StringType
+                }
+            )
+        ){ entry ->
+            val username = entry.arguments?.getString("followers")
+            ProfileScreen(username){
+                Log.e("profile",it.name)
+            }
+        }
         composable(
             route= "$profileName/${CardType.FOLLOWERS}"
         ){

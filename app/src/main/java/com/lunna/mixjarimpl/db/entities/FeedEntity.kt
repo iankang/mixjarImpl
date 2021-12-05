@@ -1,12 +1,6 @@
 package com.lunna.mixjarimpl.db.entities
 
 data class FeedEntity(
-    val `data`: List<Data>,
-    val name: String,
-    val paging: Paging
-)
-
-data class Data(
     val cloudcasts: List<Cloudcast>,
     val created_time: String,
     val from: From,
@@ -15,6 +9,7 @@ data class Data(
     val type: String,
     val url: String
 )
+
 
 data class Cloudcast(
     val audio_length: Int,
