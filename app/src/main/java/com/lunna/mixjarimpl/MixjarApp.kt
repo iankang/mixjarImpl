@@ -14,7 +14,7 @@ class MixjarApp: MultiDexApplication() {
   super.onCreate()
   startKoin {
    androidLogger(Level.INFO)
-   androidContext(this@MixjarApp)
+   androidContext(applicationContext)
    modules(
     listOf(
      databaseModule,

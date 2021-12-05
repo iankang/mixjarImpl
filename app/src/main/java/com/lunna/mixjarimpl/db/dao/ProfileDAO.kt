@@ -17,12 +17,12 @@ interface ProfileDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
      fun insertProfile(profile:ProfileEntity?)
 
-    @Query("SELECT * FROM profileentity WHERE `username`=:key ")
+    @Query("SELECT * FROM profileentity WHERE username=:key")
      fun getProfileByUsername(key: String): ProfileEntity?
 
     @Query("DELETE FROM profileentity")
      fun deleteAllProfiles()
 
-    @Query("DELETE FROM profileentity WHERE `username`=:key ")
+    @Query("DELETE FROM profileentity WHERE username=:key")
      fun deleteSingleProfileByKey(key:String)
 }

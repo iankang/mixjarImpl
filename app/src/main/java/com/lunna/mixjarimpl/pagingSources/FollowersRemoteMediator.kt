@@ -53,25 +53,30 @@ class FollowersRemoteMediator(
             withContext(Dispatchers.IO){
                 Log.d("$TAG page",page.toString())
                 val response = mixCloud.getUserFollowers(username = username,page = page)
-                Log.d("$TAG response",response.toString())
+//                Log.d("$TAG response",response.toString())
                 val isEndOfList = response?.paging?.next == null
 
                 if(loadType == LoadType.REFRESH){
-                    followersPagingRepository.deleteAll()
-                    followersRepository.deleteAllFollowers()
+                    Log.d("$TAG clearData","clear Data")
+                    withContext(Dispatchers.IO){
+                        followersPagingRepository.deleteAll()
+                        followersRepository.deleteAllFollowers()
+                    }
                 }
                 val prevKey = if (page == DEFAULT_PAGE_INDEX) null else page - 1
                 val nextKey = if (isEndOfList) null else page + 1
                 val keys = response?.data?.map {
-                    Log.d("$TAG keys ",it.toString())
-                    FollowersPagingEntity(key = it?.key!!, previousKey = prevKey,nextKey = nextKey)
+//                    Log.d("$TAG keys ",it.toString())
+                    FollowersPagingEntity(key = it.key!!, previousKey = prevKey,nextKey = nextKey)
                 }
 
                 if (keys != null) {
                     followersPagingRepository.insertKeys(keys)
                 }
                 response?.data?.forEach {
-                    followersRepository.addFollower(it?.toFollowersEntity(username))
+                    withContext(Dispatchers.IO){
+                        followersRepository.addFollower(it.toFollowersEntity(username))
+                    }
                 }
                 MediatorResult.Success(endOfPaginationReached = isEndOfList)
             }

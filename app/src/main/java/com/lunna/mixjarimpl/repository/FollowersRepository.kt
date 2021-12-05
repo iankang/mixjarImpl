@@ -4,16 +4,19 @@ import androidx.paging.*
 import com.lunna.mixjarimpl.db.MixjarImplDB
 import com.lunna.mixjarimpl.db.entities.FollowersEntity
 import com.mixsteroids.mixjar.models.UserFollowersData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class FollowersRepository(
     private val db:MixjarImplDB
 ) {
-    fun addFollower(followersEntity: FollowersEntity?){
+    suspend fun addFollower(followersEntity: FollowersEntity?){
         db.followersDAO.insertFollowers(followersEntity)
     }
 
-    fun addManyFollowers(followersEntity: List<FollowersEntity>){
+   suspend fun addManyFollowers(followersEntity: List<FollowersEntity>){
         db.followersDAO.insertManyFollowers(followersEntity)
     }
 
@@ -33,11 +36,11 @@ class FollowersRepository(
 //        return db.followersDAO.getFollowerByUsernamePaged(username)
 //    }
 
-    fun deleteAllFollowers(){
+   suspend fun deleteAllFollowers(){
         db.followersDAO.deleteAll()
     }
 
-    fun deleteAllByUserName(username: String){
+    suspend fun deleteAllByUserName(username: String){
         db.followersDAO.deleteAllFromUsername(username)
     }
 
