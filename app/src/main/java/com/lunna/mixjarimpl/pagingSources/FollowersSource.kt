@@ -13,7 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class FollowersSource(
-    val username:String): PagingSource<Int, FollowersEntity>() {
+    val username:String
+    ): PagingSource<Int, FollowersEntity>() {
 
     val TAG:String = FollowersSource::class.java.simpleName
 

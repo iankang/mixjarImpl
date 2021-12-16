@@ -52,7 +52,7 @@ class FollowersRemoteMediator(
 
             withContext(Dispatchers.IO){
                 Log.d("$TAG page",page.toString())
-                val response = mixCloud.getUserFollowers(username = username,page = page)
+                val response = mixCloud.getUserFollowers(username = username, limit = state.config.pageSize, page = page)
 //                Log.d("$TAG response",response.toString())
                 val isEndOfList = response?.paging?.next == null
 

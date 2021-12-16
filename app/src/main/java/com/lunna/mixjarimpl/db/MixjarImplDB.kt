@@ -2,10 +2,7 @@ package com.lunna.mixjarimpl.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.lunna.mixjarimpl.db.dao.FollowersDAO
-import com.lunna.mixjarimpl.db.dao.FollowersPagingDAO
-import com.lunna.mixjarimpl.db.dao.FollowingDAO
-import com.lunna.mixjarimpl.db.dao.ProfileDAO
+import com.lunna.mixjarimpl.db.dao.*
 import com.lunna.mixjarimpl.db.entities.FollowersEntity
 import com.lunna.mixjarimpl.db.entities.FollowersPagingEntity
 import com.lunna.mixjarimpl.db.entities.FollowingEntity
@@ -22,6 +19,7 @@ import com.lunna.mixjarimpl.db.entities.ProfileEntity
 abstract class MixjarImplDB: RoomDatabase() {
     abstract val profileDAO:ProfileDAO
     abstract val followingDAO:FollowingDAO
+    abstract val followingPagingDAO:FollowingPagingDAO
     abstract val followersDAO:FollowersDAO
     abstract val followersPagingDAO:FollowersPagingDAO
 }
