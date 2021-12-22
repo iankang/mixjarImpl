@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -105,7 +106,9 @@ fun Navigation(
         composable(
             route= "$profileName/${CardType.FOLLOWING}"
         ){
-            FollowingScreen()
+            if (username != null) {
+                FollowingList(username)
+            }
         }
         composable(
             route= "$profileName/${CardType.LIKES}"

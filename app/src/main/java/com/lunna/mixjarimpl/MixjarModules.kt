@@ -28,6 +28,7 @@ val databaseModule = module {
     fun provideProfileDAO(db:MixjarImplDB): ProfileDAO{
         return db.profileDAO
     }
+
     fun provideFollowingDAO(db:MixjarImplDB):FollowingDAO{
         return db.followingDAO
     }
@@ -35,9 +36,11 @@ val databaseModule = module {
     fun provideFollowingPagingDAO(db:MixjarImplDB):FollowingPagingDAO{
         return db.followingPagingDAO
     }
+
     fun provideFollowersDAO(db:MixjarImplDB):FollowersDAO{
         return db.followersDAO
     }
+
     fun provideFollowersPagingDAO(db:MixjarImplDB):FollowersPagingDAO{
         return db.followersPagingDAO
     }
@@ -75,8 +78,8 @@ val repositoryModule = module {
     single { provideProfileRepository(get()) }
     single { provideFollowerRepository(get()) }
     single { provideFollowingRepository(get()) }
-    single {provideFollowingPagingRepsitory(get())}
-    single {provideFollowersPagingRepository(get())}
+    single { provideFollowingPagingRepsitory(get()) }
+    single { provideFollowersPagingRepository(get()) }
 }
 
 val viewModelModule = module {

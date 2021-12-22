@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.paging.compose.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -99,7 +100,6 @@ fun followImage(followingItem:FollowingEntity) {
 //}
 
 @ExperimentalPagingApi
-@ExperimentalFoundationApi
 @Composable
 fun FollowingList(username: String){
     val list = listOf<String>(
@@ -112,14 +112,9 @@ fun FollowingList(username: String){
     val followingViewModel by viewModel<FollowingViewModel>()
 
     val following: LazyPagingItems<FollowingEntity> = followingViewModel.following(username).collectAsLazyPagingItems()
-    LazyVerticalGrid(
-        cells = GridCells.Fixed(2),
-        modifier = Modifier.padding(16.dp)
-            .fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        androidx.paging.compose.items(
-            items = following,
+   LazyColumn{
+      items(
+          items = following,
            key = {following:FollowingEntity -> following.key}){
            value: FollowingEntity? ->
            if (value != null) {

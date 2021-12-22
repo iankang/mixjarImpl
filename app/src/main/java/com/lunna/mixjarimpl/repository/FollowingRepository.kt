@@ -1,6 +1,7 @@
 package com.lunna.mixjarimpl.repository
 
 import androidx.paging.PagingSource
+import androidx.room.withTransaction
 import com.lunna.mixjarimpl.db.MixjarImplDB
 import com.lunna.mixjarimpl.db.entities.FollowingEntity
 import com.mixsteroids.mixjar.models.UserFollowingResponseData
@@ -10,43 +11,61 @@ class FollowingRepository(
 ){
 
     suspend fun addFollower(FollowingEntity: FollowingEntity?){
-        db.followingDAO.insertFollowing(FollowingEntity)
+        db.withTransaction {
+            db.followingDAO.insertFollowing(FollowingEntity)
+        }
     }
 
-    suspend fun addManyFollowers(FollowingEntity: List<FollowingEntity>){
-        db.followingDAO.insertManyFollowing(FollowingEntity)
+    suspend fun addManyFollowing(FollowingEntity: List<FollowingEntity>){
+        db.withTransaction {
+            db.followingDAO.insertManyFollowing(FollowingEntity)
+        }
     }
 
-    fun getAllFollowers(): List<FollowingEntity?> {
-        return db.followingDAO.getAllFollowing()
+    suspend fun getAllFollowing(): List<FollowingEntity?> {
+        return db.withTransaction {
+            db.followingDAO.getAllFollowing()
+        }
     }
 
-    fun getAllFollowersByMainUser(mainUser:String): PagingSource<Int, FollowingEntity> {
-        return db.followingDAO.getAllFollowingByMainUser(mainUser)
+    fun getAllFollowingByMainUser(mainUser:String): PagingSource<Int, FollowingEntity> {
+           return db.followingDAO.getAllFollowingByMainUser(mainUser)
     }
 
-    fun getFollowerByUsername(username:String): FollowingEntity?{
-        return db.followingDAO.getFollowingUser(username)
+    suspend fun getFollowerByUsername(username:String): FollowingEntity?{
+        return db.withTransaction {
+            db.followingDAO.getFollowingUser(username)
+        }
+
     }
 
 //    fun getFollowersByUsernamePaged(username: String): PagingSource<Int, FollowingEntity> {
 //        return db.followingDAO.getFollowerByUsernamePaged(username)
 //    }
 
-    suspend fun deleteAllFollowers(){
-        db.followingDAO.deleteAll()
+    suspend fun deleteAllFollowing(){
+        return db.withTransaction {
+            db.followingDAO.deleteAll()
+        }
+
     }
 
     suspend fun deleteAllByUserName(username: String){
-        db.followingDAO.deleteAllFromMainUser(username)
+        return db.withTransaction {
+            db.followingDAO.deleteAllFromMainUser(username)
+        }
     }
 
-    fun getTotalCount():Int?{
-        return db.followingDAO.count()
+    suspend fun getTotalCount():Int?{
+        return db.withTransaction {
+            db.followingDAO.count()
+        }
     }
 
-    fun getTotalCountByMainUser(mainUser: String):Int?{
-        return db.followingDAO.countByMainUser(mainUser)
+    suspend fun getTotalCountByMainUser(mainUser: String):Int?{
+        return db.withTransaction {
+            db.followingDAO.countByMainUser(mainUser)
+        }
     }
 
 }

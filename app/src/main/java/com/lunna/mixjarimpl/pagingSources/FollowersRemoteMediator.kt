@@ -28,6 +28,7 @@ class FollowersRemoteMediator(
     ):RemoteMediator<Int,FollowersEntity>() {
 
     private val DEFAULT_PAGE_INDEX :Int = 0
+    private var pageSize:Int = 0
     private val mixCloud =MixCloud()
     private val TAG: String? = FollowersRemoteMediator::class.simpleName
 
@@ -52,16 +53,17 @@ class FollowersRemoteMediator(
 
             withContext(Dispatchers.IO){
                 Log.d("$TAG page",page.toString())
-                val response = mixCloud.getUserFollowers(username = username, limit = state.config.pageSize, page = page)
+                pageSize = getPageSize(loadType, state)
+                Log.d("$TAG pageSize",pageSize.toString())
+                val response = mixCloud.getUserFollowers(username = username, limit = pageSize, page = page)
 //                Log.d("$TAG response",response.toString())
                 val isEndOfList = response?.paging?.next == null
 
                 if(loadType == LoadType.REFRESH){
                     Log.d("$TAG clearData","clear Data")
-                    withContext(Dispatchers.IO){
-                        followersPagingRepository.deleteAll()
-                        followersRepository.deleteAllFollowers()
-                    }
+                    followersPagingRepository.deleteAll()
+                    followersRepository.deleteAllFollowers()
+
                 }
                 val prevKey = if (page == DEFAULT_PAGE_INDEX) null else page - 1
                 val nextKey = if (isEndOfList) null else page + 1
@@ -86,21 +88,21 @@ class FollowersRemoteMediator(
             return MediatorResult.Error(e)
         }
     }
-    private  fun getFirstRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
+    private suspend fun getFirstRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
         return state.pages
             .firstOrNull{ it.data.isNotEmpty() }
             ?.data?.firstOrNull()
             ?.let { followerPaging -> followersPagingRepository.getPagingByKey(followerPaging.key) }
     }
 
-    private  fun getLastRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
+    private suspend fun getLastRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
         return state.pages
-            .lastOrNull { it.data.isNotEmpty() }
+            .lastOrNull { it.data.isNotEmpty()}
             ?.data?.lastOrNull()
             ?.let { followerPaging -> followersPagingRepository.getPagingByKey(followerPaging.key) }
     }
 
-    private fun getClosestRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
+    private suspend fun getClosestRemoteKey(state: PagingState<Int, FollowersEntity>): FollowersPagingEntity? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.key?.let { keyId ->
                 followersPagingRepository.getPagingByKey(keyId)
@@ -111,7 +113,7 @@ class FollowersRemoteMediator(
     /**
      * this returns the page key or the final end of list success result
      */
-    private fun getKeyPageData(loadType: LoadType, state: PagingState<Int, FollowersEntity>): Any? {
+    private suspend fun getKeyPageData(loadType: LoadType, state: PagingState<Int, FollowersEntity>): Any? {
         return when (loadType) {
             LoadType.REFRESH -> {
                 Log.d("$TAG: refresh","refresh")
@@ -127,6 +129,21 @@ class FollowersRemoteMediator(
             LoadType.PREPEND -> {
                 MediatorResult.Success(endOfPaginationReached = true)
             }
+        }
+    }
+
+    private fun getPageSize(loadType: LoadType,state: PagingState<Int, FollowersEntity>):Int{
+        return when(loadType){
+            LoadType.REFRESH ->{
+                state.config.initialLoadSize
+            }
+            LoadType.PREPEND ->{
+                state.config.pageSize
+            }
+            LoadType.APPEND ->{
+                state.config.pageSize
+            }
+
         }
     }
 }

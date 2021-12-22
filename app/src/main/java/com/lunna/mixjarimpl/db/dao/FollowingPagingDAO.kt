@@ -13,9 +13,9 @@ interface FollowingPagingDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPaging(followersPagingEntity: List<FollowingPagingEntity>)
 
-    @Query("SELECT * FROM followers_paging WHERE `key`=:key")
+    @Query("SELECT * FROM following_paging WHERE `key`=:key")
     fun getPaging(key:String):FollowingPagingEntity?
 
-    @Query("DELETE FROM followers_paging")
+    @Query("DELETE FROM following_paging")
     fun deleteAll()
 }

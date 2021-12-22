@@ -18,24 +18,24 @@ interface FollowingDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertManyFollowing(following:List<FollowingEntity?>)
 
-    @Query("SELECT * FROM followingentity")
+    @Query("SELECT * FROM followingEntity")
     fun getAllFollowing():List<FollowingEntity?>
 
-    @Query("SELECT * FROM followingentity WHERE mainUser = :mainUser")
+    @Query("SELECT * FROM followingEntity WHERE mainUser = :mainUser")
     fun getAllFollowingByMainUser(mainUser:String):PagingSource<Int,FollowingEntity>
 
-    @Query("SELECT * FROM followingentity WHERE username =:username")
+    @Query("SELECT * FROM followingEntity WHERE username =:username")
     fun getFollowingUser(username:String):FollowingEntity?
 
-    @Query("DELETE FROM followingentity")
+    @Query("DELETE FROM followingEntity")
     fun deleteAll()
 
-    @Query("DELETE FROM followingentity WHERE mainUser=:mainUser")
+    @Query("DELETE FROM followingEntity WHERE mainUser=:mainUser")
     fun deleteAllFromMainUser(mainUser: String)
 
-    @Query("SELECT COUNT(*) FROM followingentity")
+    @Query("SELECT COUNT(*) FROM followingEntity")
     fun count():Int?
 
-    @Query("SELECT COUNT(*) FROM followingentity WHERE mainUser=:mainUser")
+    @Query("SELECT COUNT(*) FROM followingEntity WHERE mainUser=:mainUser")
     fun countByMainUser(mainUser: String):Int?
 }
