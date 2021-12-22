@@ -1,5 +1,6 @@
 package com.lunna.mixjarimpl.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -21,7 +22,7 @@ interface FollowingDAO {
     fun getAllFollowing():List<FollowingEntity?>
 
     @Query("SELECT * FROM followingentity WHERE mainUser = :mainUser")
-    fun getAllFollowingByMainUser(mainUser:String):List<FollowingEntity?>
+    fun getAllFollowingByMainUser(mainUser:String):PagingSource<Int,FollowingEntity>
 
     @Query("SELECT * FROM followingentity WHERE username =:username")
     fun getFollowingUser(username:String):FollowingEntity?

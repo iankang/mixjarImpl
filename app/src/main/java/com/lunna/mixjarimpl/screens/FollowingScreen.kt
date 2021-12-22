@@ -3,39 +3,35 @@ package com.lunna.mixjarimpl.screens
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.paging.compose.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.lunna.mixjarimpl.R
+import com.lunna.mixjarimpl.db.entities.FollowingEntity
 import com.lunna.mixjarimpl.ui.theme.MixjarImplTheme
-import com.lunna.mixjarimpl.utilities.LoadingItem
-import com.skydoves.landscapist.ImageBySource
-import com.skydoves.landscapist.glide.GlideImage
+import com.lunna.mixjarimpl.viewmodels.FollowingViewModel
+import org.koin.androidx.compose.viewModel
 
-@ExperimentalFoundationApi
-@Composable
-fun FollowingScreen() {
-    MixjarImplTheme {
-        FollowingList()
-    }
-}
+//@ExperimentalFoundationApi
+//@Composable
+//fun FollowingScreen() {
+//    MixjarImplTheme {
+//        FollowingList()
+//    }
+//}
 
 //
 //@Composable
@@ -67,7 +63,7 @@ fun FollowingScreen() {
 //}
 
 @Composable
-fun followImage(username:String) {
+fun followImage(followingItem:FollowingEntity) {
     MixjarImplTheme {
 
         Box(
@@ -83,7 +79,7 @@ fun followImage(username:String) {
             )
 
             Text(
-                text = username,
+                text = followingItem.name!!,
                 modifier = Modifier.align(Alignment.BottomCenter),
                 color = Color.White
             )
@@ -91,36 +87,44 @@ fun followImage(username:String) {
     }
 }
 
-@Composable
-@Preview(name = "image")
-@Preview(name = "imageDark", uiMode = UI_MODE_NIGHT_YES)
-fun followImagePreview() {
-    MixjarImplTheme {
+//@Composable
+//@Preview(name = "image")
+//@Preview(name = "imageDark", uiMode = UI_MODE_NIGHT_YES)
+//fun followImagePreview() {
+//    MixjarImplTheme {
+//
+//    followImage("kangethe")
+//
+//    }
+//}
 
-    followImage("kangethe")
-
-    }
-}
-
+@ExperimentalPagingApi
 @ExperimentalFoundationApi
 @Composable
-@Preview(name = "followingList")
-@Preview(name = "followingList", uiMode = UI_MODE_NIGHT_YES)
-fun FollowingList(){
+fun FollowingList(username: String){
     val list = listOf<String>(
         "mtu",
         "mkali",
         "ni",
         "mgani"
     )
+
+    val followingViewModel by viewModel<FollowingViewModel>()
+
+    val following: LazyPagingItems<FollowingEntity> = followingViewModel.following(username).collectAsLazyPagingItems()
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
         modifier = Modifier.padding(16.dp)
             .fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(items = list, itemContent = { item ->
-            followImage(item)
-        })
+        androidx.paging.compose.items(
+            items = following,
+           key = {following:FollowingEntity -> following.key}){
+           value: FollowingEntity? ->
+           if (value != null) {
+               followImage(value)
+           }
+       }
     }
 }

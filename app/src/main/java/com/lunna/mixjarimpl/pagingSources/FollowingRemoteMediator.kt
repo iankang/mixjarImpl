@@ -11,10 +11,13 @@ import com.lunna.mixjarimpl.db.entities.FollowingEntity
 import com.lunna.mixjarimpl.db.entities.FollowingPagingEntity
 import com.lunna.mixjarimpl.repository.FollowingPagingRepository
 import com.lunna.mixjarimpl.repository.FollowingRepository
+import com.lunna.mixjarimpl.repository.toFollowersEntity
+import com.lunna.mixjarimpl.repository.toFollowingEntity
 import com.mixsteroids.mixjar.MixCloud
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InvalidObjectException
+import java.lang.Exception
 
 @ExperimentalPagingApi
 class FollowingRemoteMediator(
@@ -53,10 +56,27 @@ class FollowingRemoteMediator(
                     Log.d("$TAG clearData","clear Data")
                     withContext(Dispatchers.IO){
                         followingPagingRepository.deleteAll()
-                        followingRepository.
+                        followingRepository.deleteAllFollowers()
                     }
                 }
+                val prevKey = if (page == DEFAULT_PAGE_INDEX) null else page - 1
+                val nextKey = if (isEndOfList) null else page + 1
+                val keys = response?.data?.map {
+//                    Log.d("$TAG keys ",it.toString())
+                    FollowingPagingEntity(key = it?.key!!, previousKey = prevKey,nextKey = nextKey)
+                }
+                if (keys != null) {
+                    followingPagingRepository.insertKeys(keys)
+                }
+                response?.data?.forEach {
+                    withContext(Dispatchers.IO){
+                        followingRepository.addFollower(it?.toFollowingEntity(username))
+                    }
+                }
+                MediatorResult.Success(endOfPaginationReached = isEndOfList)
             }
+        }catch (e:Exception){
+            return MediatorResult.Error(e)
         }
 
     }
@@ -64,7 +84,7 @@ class FollowingRemoteMediator(
     /**
      * this returns the page key or the final end of list success result
      */
-    private fun getKeyPageData(loadType: LoadType, state: PagingState<Int, FollowersEntity>): Any? {
+    private fun getKeyPageData(loadType: LoadType, state: PagingState<Int, FollowingEntity>): Any? {
         return when (loadType) {
             LoadType.REFRESH -> {
                 Log.d("$TAG: refresh","refresh")
@@ -83,7 +103,7 @@ class FollowingRemoteMediator(
         }
     }
 
-    private  fun getLastRemoteKey(state: PagingState<Int, FollowersEntity>): FollowingPagingEntity? {
+    private  fun getLastRemoteKey(state: PagingState<Int, FollowingEntity>): FollowingPagingEntity? {
         return state.pages
             .lastOrNull { it.data.isNotEmpty() }
             ?.data?.lastOrNull()
